@@ -105,6 +105,11 @@
         mask-size: 20px 20px;
     }
 
+    /* Touch: eliminar delay de 300ms en todos los botones y links interactivos */
+    button, a, [role="button"], .cursor-pointer, label {
+        touch-action: manipulation;
+    }
+
     /* SPA page transitions */
     .spa-page {
         display: none;
@@ -121,7 +126,7 @@
     }
 
     /* Active nav link style */
-    .nav-link { transition: all 0.3s; }
+    .nav-link { transition: all 0.3s; touch-action: manipulation; }
     .nav-link.active-page {
         color: #ba1340 !important;
         font-weight: 700;
@@ -181,10 +186,9 @@
     .song-row:hover { background: rgba(255,217,223,0.35); border-radius: 4px; }
     .song-row.active { background: rgba(255,217,223,0.55); border-radius: 4px; }
 
-#music-box-btn { cursor: pointer; }
-#mw-player, #mw-playlist { will-change: transform; }
+#music-box-btn { cursor: pointer; touch-action: manipulation; }
+#music-widget button { touch-action: manipulation; }
 .panel-dragging { transition: none !important; animation: none !important; }
-body.no-select { user-select: none !important; -webkit-user-select: none !important; }
 </style>
 <script id="tailwind-config">
     tailwind.config = {
@@ -957,7 +961,10 @@ function clearEditor() {
 }
 
 // ── Main init ───────────────────────────────────
+let diaryInitialized = false;
 function initDiaryScript() {
+    if (diaryInitialized) { renderEntries(); return; }
+    diaryInitialized = true;
     checkStorage();
 
     // Today's date
@@ -1079,6 +1086,8 @@ function initDiaryScript() {
 // ─── Home: sticky notes click bounce ─────────────
 function initStickyNotes() {
     document.querySelectorAll('#page-home .w-64.shadow-md').forEach(note => {
+        // touch-action para eliminar el delay de 300ms en móvil
+        note.style.touchAction = 'manipulation';
         note.addEventListener('click', () => {
             note.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             note.style.transform = 'scale(1.1) rotate(0deg) translateY(-20px)';
@@ -1119,9 +1128,11 @@ mwCloseSpotify.addEventListener('click', (e) => {
     const lbBack   = document.getElementById('gallery-lightbox-backdrop');
     if (!lightbox) return;
 
+    // FIX: en touch el overlay hover no es visible, listener en el contenedor padre
     document.querySelectorAll('.gallery-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => {
-            const img = trigger.parentElement.querySelector('img');
+        const container = trigger.parentElement;
+        container.addEventListener('click', () => {
+            const img = container.querySelector('img');
             if (img && img.src) {
                 lbImg.src = img.src;
                 lightbox.classList.remove('hidden');
