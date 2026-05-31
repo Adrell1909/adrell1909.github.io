@@ -105,9 +105,16 @@
         mask-size: 20px 20px;
     }
 
-    /* Touch: eliminar delay de 300ms en todos los botones y links interactivos */
-    button, a, [role="button"], .cursor-pointer, label {
+    /* ── Touch: eliminar delay de 300ms en todos los elementos interactivos ── */
+    button, a, label, input, textarea, select,
+    [role="button"], .cursor-pointer, nav a {
         touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(129, 81, 91, 0.15);
+    }
+    /* ── Active states para feedback táctil visible ── */
+    button:active, a:active, .cursor-pointer:active {
+        opacity: 0.75;
+        transform: scale(0.97);
     }
 
     /* SPA page transitions */
@@ -126,7 +133,7 @@
     }
 
     /* Active nav link style */
-    .nav-link { transition: all 0.3s; touch-action: manipulation; }
+    .nav-link { transition: all 0.3s; }
     .nav-link.active-page {
         color: #ba1340 !important;
         font-weight: 700;
@@ -173,6 +180,11 @@
         transform: translateY(0) scale(1);
         pointer-events: all;
     }
+    /* iOS Safari fix: una vez visible, limpiar transform para
+       que el iframe no quede dentro de un contexto transformado */
+    .music-panel.settled {
+        transform: none;
+    }
 
     .paper-notebook {
         background-color: #fff;
@@ -186,9 +198,10 @@
     .song-row:hover { background: rgba(255,217,223,0.35); border-radius: 4px; }
     .song-row.active { background: rgba(255,217,223,0.55); border-radius: 4px; }
 
-#music-box-btn { cursor: pointer; touch-action: manipulation; }
-#music-widget button { touch-action: manipulation; }
+#music-box-btn { cursor: pointer; }
+#mw-player, #mw-playlist { will-change: transform; }
 .panel-dragging { transition: none !important; animation: none !important; }
+body.no-select { user-select: none !important; -webkit-user-select: none !important; }
 </style>
 <script id="tailwind-config">
     tailwind.config = {
@@ -573,13 +586,13 @@
             </div>
             <!-- Actions -->
             <div class="mt-12 flex flex-wrap justify-center gap-4">
-                <button id="diary-save-btn"
+                <button id="diary-save-btn" type="button"
                     class="group relative flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-full font-headline-md shadow-lg hover:bg-tertiary hover:scale-105 transition-all duration-300">
                     <span class="material-symbols-outlined group-hover:animate-bounce">auto_awesome</span>
                     Guardar Recuerdo
-                    <div class="absolute -top-4 -right-4 bg-tertiary-container p-2 rounded-full shadow-md rotate-12 group-hover:rotate-0 transition-transform"></div>
+                    <div class="absolute -top-4 -right-4 bg-tertiary-container p-2 rounded-full shadow-md rotate-12 group-hover:rotate-0 transition-transform pointer-events-none"></div>
                 </button>
-                <button id="diary-new-btn"
+                <button id="diary-new-btn" type="button"
                     class="flex items-center gap-2 bg-surface-container text-on-surface-variant px-6 py-4 rounded-full font-headline-md shadow hover:bg-secondary-container hover:scale-105 transition-all duration-300">
                     <span class="material-symbols-outlined">add_circle</span>
                     Nueva entrada
@@ -696,7 +709,7 @@
 
     <!-- Panel Spotify -->
     <div id="mw-spotify-panel" class="music-panel w-[340px] relative">
-        <button id="mw-close-spotify" class="absolute -top-3 -right-3 z-20 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-outline hover:text-tertiary transition-colors border border-outline-variant/20">
+        <button id="mw-close-spotify" type="button" class="absolute -top-3 -right-3 z-20 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-outline hover:text-tertiary transition-colors border border-outline-variant/20">
             <span class="material-symbols-outlined text-[18px]">close</span>
         </button>
         <iframe src="https://open.spotify.com/embed/playlist/55hcjfEUbTenPmeilK8F0k"
@@ -705,7 +718,6 @@
                 frameborder="0"
                 allowfullscreen=""
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
                 class="rounded-xl shadow-xl"></iframe>
     </div>
 
@@ -963,7 +975,15 @@ function clearEditor() {
 // ── Main init ───────────────────────────────────
 let diaryInitialized = false;
 function initDiaryScript() {
-    if (diaryInitialized) { renderEntries(); return; }
+    // Guard: solo inicializar event listeners una vez
+    // renderEntries() sí se llama siempre para refrescar datos
+    if (diaryInitialized) {
+        checkStorage();
+        renderEntries();
+        document.getElementById('diary-date-display').textContent =
+            new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        return;
+    }
     diaryInitialized = true;
     checkStorage();
 
@@ -1086,8 +1106,6 @@ function initDiaryScript() {
 // ─── Home: sticky notes click bounce ─────────────
 function initStickyNotes() {
     document.querySelectorAll('#page-home .w-64.shadow-md').forEach(note => {
-        // touch-action para eliminar el delay de 300ms en móvil
-        note.style.touchAction = 'manipulation';
         note.addEventListener('click', () => {
             note.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             note.style.transform = 'scale(1.1) rotate(0deg) translateY(-20px)';
@@ -1104,9 +1122,17 @@ const mwSpotifyPanel = document.getElementById('mw-spotify-panel');
 const mwCloseSpotify = document.getElementById('mw-close-spotify');
 
 function mwShow(panel) {
-    requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('visible')));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        panel.classList.add('visible');
+        // iOS Safari fix: limpiar transform después de la transición
+        // para que el iframe reciba touch events correctamente
+        setTimeout(() => panel.classList.add('settled'), 300);
+    }));
 }
-function mwHide(panel) { panel.classList.remove('visible'); }
+function mwHide(panel) {
+    panel.classList.remove('visible');
+    panel.classList.remove('settled');
+}
 
 mwBoxBtn.addEventListener('click', () => {
     if (mwSpotifyPanel.classList.contains('visible')) {
@@ -1128,9 +1154,13 @@ mwCloseSpotify.addEventListener('click', (e) => {
     const lbBack   = document.getElementById('gallery-lightbox-backdrop');
     if (!lightbox) return;
 
-    // FIX: en touch el overlay hover no es visible, listener en el contenedor padre
+    // FIX móvil: opacity:0 no recibe touch en iOS/Android.
+    // Listener en el contenedor padre (siempre visible) en vez del overlay.
     document.querySelectorAll('.gallery-trigger').forEach(trigger => {
         const container = trigger.parentElement;
+        // Asegurar que el contenedor sea clickeable en móvil
+        container.style.touchAction = 'manipulation';
+        container.style.webkitTapHighlightColor = 'rgba(129,81,91,0.15)';
         container.addEventListener('click', () => {
             const img = container.querySelector('img');
             if (img && img.src) {
@@ -1150,6 +1180,14 @@ mwCloseSpotify.addEventListener('click', (e) => {
     lbClose.addEventListener('click', closeLb);
     lbBack.addEventListener('click', closeLb);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLb(); });
+
+    // Soporte swipe-down para cerrar en móvil
+    let lbTouchStartY = 0;
+    lightbox.addEventListener('touchstart', e => { lbTouchStartY = e.touches[0].clientY; }, { passive: true });
+    lightbox.addEventListener('touchend', e => {
+        const dy = e.changedTouches[0].clientY - lbTouchStartY;
+        if (dy > 60) closeLb(); // swipe hacia abajo > 60px
+    }, { passive: true });
 })();
 </script>
 </body>
