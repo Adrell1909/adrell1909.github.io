@@ -202,6 +202,52 @@
 #mw-player, #mw-playlist { will-change: transform; }
 .panel-dragging { transition: none !important; animation: none !important; }
 body.no-select { user-select: none !important; -webkit-user-select: none !important; }
+
+/* ═══ MOBILE FIXES ═══ */
+@media (hover: none) and (pointer: coarse) {
+    /* Eliminar transforms en active que roban clicks */
+    button:active, a:active, .cursor-pointer:active,
+    .polaroid-frame:active, .gallery-item:active {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+    /* Galería: lupa siempre visible en móvil */
+    .gallery-item .absolute.inset-0 {
+        opacity: 1 !important;
+        background: rgba(129, 81, 91, 0.15) !important;
+    }
+    /* Botones del header sin scale */
+    header button:active {
+        transform: none !important;
+    }
+    /* Sticky notes sin bounce excesivo en tap */
+    .w-64.shadow-md:active {
+        transform: scale(0.98) !important;
+    }
+}
+
+/* Fix específico para iOS Safari iframe */
+@supports (-webkit-touch-callout: none) {
+    .music-panel.visible {
+        transform: none !important;
+    }
+    .music-panel iframe {
+        -webkit-transform: translateZ(0);
+    }
+}
+
+/* Gallery items: asegurar que el contenedor sea clickeable */
+.gallery-item {
+    -webkit-tap-highlight-color: rgba(129, 81, 91, 0.2);
+}
+
+/* Fix para botones del diario */
+#diary-save-btn, #diary-new-btn,
+#draft-restore-btn, #draft-discard-btn,
+#modal-edit-btn, #modal-delete-btn,
+#diary-export-btn {
+    touch-action: manipulation;
+}
 </style>
 <script id="tailwind-config">
     tailwind.config = {
@@ -411,27 +457,27 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <section class="mt-32">
 <h2 class="font-headline-lg text-primary text-center mb-12">Galería</h2>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[150px] md:auto-rows-[200px]">
-<div class="col-span-2 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer">
+<div class="col-span-2 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="0">
 <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A vintage jewelry box overflowing with pearl necklaces, pink ribbons, and old postcards." src="./images/gallery/cat.jpeg">
-<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gallery-trigger">
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
 </div>
 </div>
-<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer">
+<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="1">
 <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A close-up shot of cherry blossoms against a clear blue sky." src="./images/gallery/spotify.jpeg">
-<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gallery-trigger">
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
 </div>
 </div>
-<div class="col-span-1 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer">
+<div class="col-span-1 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="2">
 <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A collection of pink and white macarons arranged in a heart shape on a vintage lace plate." src="./images/gallery/flower.jpeg">
-<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gallery-trigger">
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
 </div>
 </div>
-<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer">
+<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="3">
 <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A cozy bed with white linens and pink pillows." src="./images/gallery/shesbeautiful.jpeg">
-<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gallery-trigger">
+<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
 </div>
 </div>
@@ -758,12 +804,14 @@ function navigateTo(page) {
     if (page === 'home') initStickyNotes();
 }
 
-// Nav click handlers
+// Nav click handlers (pointerdown para móvil, click para PC)
 document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', e => {
+    const handler = function(e) {
         e.preventDefault();
+        e.stopPropagation();
         navigateTo(link.dataset.page);
-    });
+    };
+    link.addEventListener('pointerdown', handler);
 });
 
 // Handle browser back/forward
@@ -934,8 +982,8 @@ function openModal(id) {
     document.getElementById('modal-date').textContent  = formatDate(entry.date);
     document.getElementById('modal-title').textContent = entry.title || 'Sin título';
     document.getElementById('modal-body').textContent  = entry.body || '';
-    document.getElementById('modal-edit-btn').onclick   = () => { closeModal(); loadEntryIntoEditor(id); };
-    document.getElementById('modal-delete-btn').onclick = () => deleteEntry(id);
+    document.getElementById('modal-edit-btn').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); loadEntryIntoEditor(id); });
+    document.getElementById('modal-delete-btn').addEventListener('pointerdown', function(e) { e.preventDefault(); deleteEntry(id); });
     document.getElementById('diary-modal').classList.remove('hidden');
 }
 
@@ -999,7 +1047,8 @@ function initDiaryScript() {
         const banner = document.getElementById('diary-draft-banner');
         banner.classList.remove('hidden');
 
-        document.getElementById('draft-restore-btn').onclick = () => {
+        document.getElementById('draft-restore-btn').addEventListener('pointerdown', function(e) {
+            e.preventDefault();
             document.getElementById('diary-title-input').value = draft.title || '';
             document.getElementById('diary-body-input').value  = draft.body  || '';
             editingId = draft.editingId || null;
@@ -1009,12 +1058,13 @@ function initDiaryScript() {
             }
             banner.classList.add('hidden');
             showToast('📝 Borrador recuperado');
-        };
+        });
 
-        document.getElementById('draft-discard-btn').onclick = () => {
+        document.getElementById('draft-discard-btn').addEventListener('pointerdown', function(e) {
+            e.preventDefault();
             draftClear();
             banner.classList.add('hidden');
-        };
+        });
     }
 
     // ── Autosave on every keystroke (debounced 1.5s) ──
@@ -1027,7 +1077,10 @@ function initDiaryScript() {
     document.getElementById('diary-body-input').addEventListener('input', autoSaveTrigger);
 
     // ── Save / Update button ──
-    document.getElementById('diary-save-btn').onclick = () => {
+    const saveBtn = document.getElementById('diary-save-btn');
+    saveBtn.addEventListener('pointerdown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         const title = document.getElementById('diary-title-input').value.trim();
         const body  = document.getElementById('diary-body-input').value.trim();
         if (!title && !body) { showToast('✏️ Escribe algo primero...'); return; }
@@ -1044,18 +1097,23 @@ function initDiaryScript() {
         clearEditor();
         renderEntries();
         showToast(editingId ? '✏️ ¡Entrada actualizada!' : '✨ ¡Recuerdo guardado!');
-    };
+    });
 
     // ── New entry ──
-    document.getElementById('diary-new-btn').onclick = clearEditor;
+    const newBtn = document.getElementById('diary-new-btn');
+    newBtn.addEventListener('pointerdown', function(e) {
+        e.preventDefault();
+        clearEditor();
+    });
 
     // ── Modal close ──
-    document.getElementById('diary-modal-close').onclick    = closeModal;
-    document.getElementById('diary-modal-backdrop').onclick = closeModal;
+    document.getElementById('diary-modal-close').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); });
+    document.getElementById('diary-modal-backdrop').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     // ── Export ──
-    document.getElementById('diary-export-btn').onclick = () => {
+    document.getElementById('diary-export-btn').addEventListener('pointerdown', function(e) {
+        e.preventDefault();
         const data = localStorage.getItem(DIARY_KEY) || '[]';
         const blob = new Blob([data], { type: 'application/json' });
         const a    = document.createElement('a');
@@ -1063,7 +1121,7 @@ function initDiaryScript() {
         a.download = `rincon-haru-diario-${new Date().toISOString().slice(0,10)}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
-    };
+    });
 
     // ── Import ──
     document.getElementById('diary-import-input').onchange = (e) => {
@@ -1106,7 +1164,8 @@ function initDiaryScript() {
 // ─── Home: sticky notes click bounce ─────────────
 function initStickyNotes() {
     document.querySelectorAll('#page-home .w-64.shadow-md').forEach(note => {
-        note.addEventListener('click', () => {
+        note.addEventListener('pointerdown', function(e) {
+            e.preventDefault();
             note.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             note.style.transform = 'scale(1.1) rotate(0deg) translateY(-20px)';
             setTimeout(() => { note.style.transform = ''; }, 1000);
@@ -1122,19 +1181,17 @@ const mwSpotifyPanel = document.getElementById('mw-spotify-panel');
 const mwCloseSpotify = document.getElementById('mw-close-spotify');
 
 function mwShow(panel) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        panel.classList.add('visible');
-        // iOS Safari fix: limpiar transform después de la transición
-        // para que el iframe reciba touch events correctamente
-        setTimeout(() => panel.classList.add('settled'), 300);
-    }));
+    panel.classList.add('visible');
+    panel.classList.add('settled');
 }
 function mwHide(panel) {
     panel.classList.remove('visible');
     panel.classList.remove('settled');
 }
 
-mwBoxBtn.addEventListener('click', () => {
+// Usar pointerdown para respuesta inmediata en móvil
+mwBoxBtn.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
     if (mwSpotifyPanel.classList.contains('visible')) {
         mwHide(mwSpotifyPanel);
     } else {
@@ -1142,7 +1199,7 @@ mwBoxBtn.addEventListener('click', () => {
     }
 });
 
-mwCloseSpotify.addEventListener('click', (e) => {
+mwCloseSpotify.addEventListener('pointerdown', function(e) {
     e.stopPropagation();
     mwHide(mwSpotifyPanel);
 });
@@ -1154,15 +1211,12 @@ mwCloseSpotify.addEventListener('click', (e) => {
     const lbBack   = document.getElementById('gallery-lightbox-backdrop');
     if (!lightbox) return;
 
-    // FIX móvil: opacity:0 no recibe touch en iOS/Android.
-    // Listener en el contenedor padre (siempre visible) en vez del overlay.
-    document.querySelectorAll('.gallery-trigger').forEach(trigger => {
-        const container = trigger.parentElement;
-        // Asegurar que el contenedor sea clickeable en móvil
-        container.style.touchAction = 'manipulation';
-        container.style.webkitTapHighlightColor = 'rgba(129,81,91,0.15)';
-        container.addEventListener('click', () => {
-            const img = container.querySelector('img');
+    // Usar pointerdown para móvil + PC. Más rápido y confiable que click.
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('pointerdown', function(e) {
+            // Solo botón izquierdo o touch
+            if (e.button !== 0 && e.button !== -1) return;
+            const img = item.querySelector('img');
             if (img && img.src) {
                 lbImg.src = img.src;
                 lightbox.classList.remove('hidden');
@@ -1186,7 +1240,7 @@ mwCloseSpotify.addEventListener('click', (e) => {
     lightbox.addEventListener('touchstart', e => { lbTouchStartY = e.touches[0].clientY; }, { passive: true });
     lightbox.addEventListener('touchend', e => {
         const dy = e.changedTouches[0].clientY - lbTouchStartY;
-        if (dy > 60) closeLb(); // swipe hacia abajo > 60px
+        if (dy > 60) closeLb();
     }, { passive: true });
 })();
 </script>
