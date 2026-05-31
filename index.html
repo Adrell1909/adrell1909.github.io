@@ -804,14 +804,12 @@ function navigateTo(page) {
     if (page === 'home') initStickyNotes();
 }
 
-// Nav click handlers (pointerdown para móvil, click para PC)
+// Nav click handlers
 document.querySelectorAll('.nav-link').forEach(link => {
-    const handler = function(e) {
+    link.addEventListener('click', function(e) {
         e.preventDefault();
-        e.stopPropagation();
         navigateTo(link.dataset.page);
-    };
-    link.addEventListener('pointerdown', handler);
+    });
 });
 
 // Handle browser back/forward
