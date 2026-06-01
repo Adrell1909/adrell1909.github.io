@@ -168,18 +168,20 @@
     }
     #music-box-btn.playing { animation: boxGlow 2.2s ease-in-out infinite; }
 
-    .music-panel {
-        opacity: 0;
-        transform: translateY(10px) scale(0.96);
-        pointer-events: none;
-        transition: opacity 0.28s ease, transform 0.28s ease;
-        transform-origin: bottom right;
-    }
-    .music-panel.visible {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: all;
-    }
+.music-panel {
+    opacity: 0;
+    visibility: hidden; /* 👈 Agregado: Bloquea toques por completo cuando está oculto */
+    transform: translateY(10px) scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease; /* 👈 Agregado: Incluye visibility en la transición */
+    transform-origin: bottom right;
+}
+.music-panel.visible {
+    opacity: 1;
+    visibility: visible; /* 👈 Agregado: Lo vuelve a hacer interactivo */
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
     /* iOS Safari fix: una vez visible, limpiar transform para
        que el iframe no quede dentro de un contexto transformado */
     .music-panel.settled {
@@ -1076,8 +1078,7 @@ function initDiaryScript() {
 
     // ── Save / Update button ──
     const saveBtn = document.getElementById('diary-save-btn');
-    saveBtn.addEventListener('pointerdown', function(e) {
-        e.preventDefault();
+    saveBtn.addEventListener('click', function(e) {
         e.stopPropagation();
         const title = document.getElementById('diary-title-input').value.trim();
         const body  = document.getElementById('diary-body-input').value.trim();
