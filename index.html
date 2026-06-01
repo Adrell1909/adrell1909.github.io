@@ -1100,8 +1100,7 @@ function initDiaryScript() {
 
     // ── New entry ──
     const newBtn = document.getElementById('diary-new-btn');
-    newBtn.addEventListener('pointerdown', function(e) {
-        e.preventDefault();
+    newBtn.addEventListener('click', function(e) {
         clearEditor();
     });
 
@@ -1189,8 +1188,7 @@ function mwHide(panel) {
 }
 
 // Usar pointerdown para respuesta inmediata en móvil
-mwBoxBtn.addEventListener('pointerdown', function(e) {
-    e.preventDefault();
+mwBoxBtn.addEventListener('click', function(e) {
     if (mwSpotifyPanel.classList.contains('visible')) {
         mwHide(mwSpotifyPanel);
     } else {
@@ -1198,7 +1196,7 @@ mwBoxBtn.addEventListener('pointerdown', function(e) {
     }
 });
 
-mwCloseSpotify.addEventListener('pointerdown', function(e) {
+mwCloseSpotify.addEventListener('click', function(e) {
     e.stopPropagation();
     mwHide(mwSpotifyPanel);
 });
