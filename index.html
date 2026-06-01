@@ -141,7 +141,7 @@
         padding-bottom: 4px;
     }
 
-    /* ── Widget de música flotante ── */
+    /* ── Widget de música flotante (CORREGIDO PARA EVITAR BLOQUEOS) ── */
     #music-widget {
         position: fixed;
         bottom: 28px;
@@ -151,6 +151,7 @@
         flex-direction: column;
         align-items: flex-end;
         gap: 10px;
+        pointer-events: none; /* Permite que los clics pasen a través del contenedor vacío */
     }
 
     #music-box-btn {
@@ -159,6 +160,7 @@
         position: relative;
         filter: drop-shadow(0 6px 16px rgba(255,193,204,0.55));
         transition: transform 0.25s ease, filter 0.25s ease;
+        pointer-events: auto; /* Devuelve el control de clics al botón físico */
     }
     #music-box-btn:hover { transform: translateY(-4px) scale(1.04); }
 
@@ -168,20 +170,20 @@
     }
     #music-box-btn.playing { animation: boxGlow 2.2s ease-in-out infinite; }
 
-.music-panel {
-    opacity: 0;
-    visibility: hidden; /* 👈 Agregado: Bloquea toques por completo cuando está oculto */
-    transform: translateY(10px) scale(0.96);
-    pointer-events: none;
-    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease; /* 👈 Agregado: Incluye visibility en la transición */
-    transform-origin: bottom right;
-}
-.music-panel.visible {
-    opacity: 1;
-    visibility: visible; /* 👈 Agregado: Lo vuelve a hacer interactivo */
-    transform: translateY(0) scale(1);
-    pointer-events: all;
-}
+    .music-panel {
+        opacity: 0;
+        visibility: hidden; /* Oculta totalmente el elemento del flujo de clics/toques del navegador */
+        transform: translateY(10px) scale(0.96);
+        pointer-events: none;
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+        transform-origin: bottom right;
+    }
+    .music-panel.visible {
+        opacity: 1;
+        visibility: visible; /* Lo vuelve a hacer interactivo al abrirse */
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
     /* iOS Safari fix: una vez visible, limpiar transform para
        que el iframe no quede dentro de un contexto transformado */
     .music-panel.settled {
@@ -335,13 +337,9 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 </head>
 <body class="font-body-md text-on-surface">
 
-<!-- Atmospheric Background Layer -->
 <div class="fixed inset-0 overflow-hidden pointer-events-none z-0" id="cloud-container"></div>
 <div class="fixed inset-0 overflow-hidden pointer-events-none z-10" id="particle-container"></div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!--                  HEADER (shared)                -->
-<!-- ═══════════════════════════════════════════════ -->
 <header class="bg-white/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop py-4 shadow-[0px_20px_40px_rgba(255,193,204,0.3)] top-0 sticky z-50">
     <div class="font-display-lg text-headline-lg text-primary tracking-tight">Rincon de Haru</div>
     <nav class="hidden md:flex gap-8 items-center">
@@ -349,7 +347,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
         <a href="#" class="nav-link text-on-surface-variant font-label-md hover:text-tertiary hover:scale-105" data-page="aventura">Aventura</a>
         <a href="#" class="nav-link text-on-surface-variant font-label-md hover:text-tertiary hover:scale-105" data-page="diario">Diario</a>
     </nav>
-    <!-- Mobile nav -->
     <nav class="flex md:hidden gap-4 items-center">
         <a href="#" class="nav-link text-on-surface-variant font-label-sm hover:text-tertiary" data-page="home">Home</a>
         <a href="#" class="nav-link text-on-surface-variant font-label-sm hover:text-tertiary" data-page="aventura">Aventura</a>
@@ -362,40 +359,31 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!--              PAGE: HOME                         -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="page-home" class="spa-page active">
     <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
 
-<!-- Hero Section -->
 <section class="flex flex-col items-center justify-center text-center py-20 min-h-[716px]">
 <div class="relative max-w-4xl">
-<!-- Decorative Elements -->
 <div class="absolute -top-12 -left-8 animate-bounce" style="animation-duration: 3s;">
-<span class="material-symbols-outlined text-6xl text-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">favorite</span>
+<span class="material-symbols-outlined text-6xl text-primary-container" style="font-variation-settings: 'FILL' 1;">favorite</span>
 </div>
 <h1 class="font-display-lg text-headline-lg md:text-[64px] text-on-primary-container mb-6 drop-shadow-sm">Rincon de Haru</h1>
 <p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">Un pequeño rincón del mundo digital donde encontrarás tus memorias, notas y momentos que te gusten.</p>
-<!-- Central Illustration Placeholder -->
 <div class="relative inline-block mx-auto group animate-float">
 <div class="absolute inset-0 bg-primary-container blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
 <div class="relative bg-white p-8 rounded-full border-4 border-primary-container/30 shadow-xl overflow-hidden">
 <img class="w-72 h-72 md:w-96 md:h-96 object-cover rounded-full" data-alt="A whimsical, dreamy illustration of a cute bunny character with a pink bow, surrounded by soft clouds, pastel hearts, and twinkling stars. The art style is soft and painterly with a focus on nostalgic kawaii aesthetics and a warm, glowing color palette of soft pinks and creams." src="./images/hero/profile.jpeg">
 </div>
-<!-- Ribbon Accents -->
 <div class="absolute -bottom-4 -right-4 bg-tertiary text-white px-6 py-2 rounded-full font-label-md shadow-lg rotate-12 transition-transform hover:scale-110">¡Feliz día!</div>
 </div>
 </div>
 </section>
-<!-- Our Moments: Polaroid Grid -->
 <section class="mt-24">
 <div class="flex items-center gap-4 mb-12">
 <h2 class="font-headline-lg text-primary">Hobbies y Momentos favoritos</h2>
 <div class="h-[2px] flex-grow bg-dashed border-t-2 border-primary-container/50"></div>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-<!-- Polaroid 1 -->
 <div class="relative animate-float" style="--base-rotation: -2deg;">
 <div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
 <div class="polaroid-frame">
@@ -403,7 +391,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <div class="mt-4 font-label-md text-center text-secondary">Invierno</div>
 </div>
 </div>
-<!-- Polaroid 2 -->
 <div class="relative mt-8 md:mt-12 animate-float-delayed" style="--base-rotation: 3deg;">
 <div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
 <div class="polaroid-frame">
@@ -411,7 +398,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <div class="mt-4 font-label-md text-center text-secondary">Escribir</div>
 </div>
 </div>
-<!-- Polaroid 3 -->
 <div class="relative md:-mt-8 animate-float" style="--base-rotation: -1deg;">
 <div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
 <div class="polaroid-frame">
@@ -421,33 +407,28 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 </div>
 </div>
 </section>
-<!-- Daily Whispers: Sticky Notes -->
 <section class="mt-32">
 <div class="bg-secondary-container/30 rounded-xl p-8 md:p-12 relative overflow-hidden">
-<!-- Scallop Top -->
 <div class="absolute top-0 left-0 w-full h-4 lace-border opacity-50"></div>
 <h2 class="font-headline-lg text-on-secondary-container mb-8 text-center">Susurros Diarios</h2>
 <div class="flex flex-wrap justify-center gap-8">
-<!-- Sticky Note 1 -->
 <div class="w-64 bg-[#fff9c4] p-6 shadow-md -rotate-3 transition-transform hover:scale-105 hover:rotate-0" style="transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
 <div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">push_pin</span>
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
 </div>
 <p class="font-body-md text-on-surface italic">"Lo más bonito que puedes llevar es una sonrisa desde el corazón"</p>
 <div class="mt-4 text-right text-label-sm text-secondary">- Melody</div>
 </div>
-<!-- Sticky Note 2 -->
 <div class="w-64 bg-[#ffe4e1] p-6 shadow-md rotate-2 transition-transform hover:scale-105 hover:rotate-0" style="transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
 <div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">push_pin</span>
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
 </div>
 <p class="font-body-md text-on-surface italic">"Tu carisma y gran corazón ayudan a los demás a avanzar."</p>
 <div class="mt-4 text-right text-label-sm text-secondary">- Andre</div>
 </div>
-<!-- Sticky Note 3 -->
 <div class="w-64 bg-[#e1f5fe] p-6 shadow-md -rotate-1 transition-transform hover:scale-105 hover:rotate-0">
 <div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: &quot;FILL&quot; 1;">push_pin</span>
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
 </div>
 <p class="font-body-md text-on-surface italic">"Amar no es solo una palabra, es el sentimiento más valioso y cálido del mundo."</p>
 <div class="mt-4 text-right text-label-sm text-secondary">- Susurros del cielo</div>
@@ -455,7 +436,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 </div>
 </div>
 </section>
-<!-- Gallery of Hearts: Bento Grid -->
 <section class="mt-32">
 <h2 class="font-headline-lg text-primary text-center mb-12">Galería</h2>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[150px] md:auto-rows-[200px]">
@@ -489,18 +469,12 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </main>
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!--              PAGE: AVENTURA (Timeline)          -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="page-aventura" class="spa-page">
     <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
 <div class="relative py-16 flex flex-col items-center">
-<!-- Timeline Central Path -->
 <div class="absolute left-1/2 top-0 bottom-0 w-1 md:w-2 bg-gradient-to-b from-primary-fixed via-primary-container to-primary-fixed-dim -translate-x-1/2 opacity-40 z-0"></div>
 <div class="absolute left-1/2 top-0 bottom-0 w-0 border-r-2 border-dashed border-primary/30 -translate-x-1/2 z-0"></div>
-<!-- Timeline Content -->
 <div class="relative z-10 w-full max-w-5xl space-y-24 md:space-y-32">
-<!-- Memory Entry 1: Left -->
 <div class="flex flex-col md:flex-row items-center md:items-start w-full group">
 <div class="w-full md:w-1/2 flex justify-center md:justify-end md:pr-12">
 <div class="relative polaroid-frame transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
@@ -512,14 +486,13 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <p class="font-body-md text-on-surface-variant">Descripción</p>
 </div>
 <div class="absolute -bottom-3 -right-3 text-primary-container">
-<span class="material-symbols-outlined text-4xl" style="font-variation-settings: &quot;FILL&quot; 1;">favorite</span>
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
 </div>
 </div>
 </div>
 <div class="hidden md:block w-4 h-4 rounded-full bg-primary mt-8 shadow-lg shadow-primary/50"></div>
 <div class="w-1/2 hidden md:block"></div>
 </div>
-<!-- Memory Entry 2: Right -->
 <div class="flex flex-col md:flex-row-reverse items-center md:items-start w-full group">
 <div class="w-full md:w-1/2 flex justify-center md:justify-start md:pl-12">
 <div class="relative polaroid-frame transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
@@ -531,14 +504,13 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <p class="font-body-md text-on-surface-variant">Descripción</p>
 </div>
 <div class="absolute -bottom-2 -left-2 text-secondary-container">
-<span class="material-symbols-outlined text-4xl" style="font-variation-settings: &quot;FILL&quot; 1;">auto_awesome</span>
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
 </div>
 </div>
 </div>
 <div class="hidden md:block w-4 h-4 rounded-full bg-primary mt-8 shadow-lg shadow-primary/50"></div>
 <div class="w-1/2 hidden md:block"></div>
 </div>
-<!-- Memory Entry 3: Left -->
 <div class="flex flex-col md:flex-row items-center md:items-start w-full group">
 <div class="w-full md:w-1/2 flex justify-center md:justify-end md:pr-12">
 <div class="relative polaroid-frame transform -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
@@ -550,7 +522,7 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <p class="font-body-md text-on-surface-variant">Descripción</p>
 </div>
 <div class="absolute top-2 right-2">
-<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: &quot;FILL&quot; 1;">stars</span>
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">stars</span>
 </div>
 </div>
 </div>
@@ -558,7 +530,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
 <div class="w-1/2 hidden md:block"></div>
 </div>
 </div>
-<!-- Add Button -->
 <div class="mt-24 relative z-10">
 
 </div>
@@ -566,19 +537,14 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </main>
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!--              PAGE: DIARIO                       -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="page-diario" class="spa-page">
     <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
 
-<!-- Title Section -->
 <div class="py-12 text-center">
     <h1 class="font-display-lg text-primary mb-2">Mi Diario</h1>
     <p class="font-body-lg text-on-surface-variant">Guarda tus pensamientos y momentos especiales</p>
 </div>
 
-<!-- localStorage warning banner (shown only if unavailable) -->
 <div id="diary-storage-warning" class="hidden max-w-4xl mx-auto mb-4">
     <div class="flex items-center gap-3 bg-error-container text-on-error-container rounded-xl px-6 py-4 font-label-md">
         <span class="material-symbols-outlined">warning</span>
@@ -587,7 +553,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </div>
 
-<!-- Draft restore banner (shown when a draft is found on load) -->
 <div id="diary-draft-banner" class="hidden max-w-4xl mx-auto mb-4">
     <div class="flex flex-wrap items-center justify-between gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-6 py-4">
         <div class="flex items-center gap-2 font-label-md">
@@ -601,13 +566,11 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </div>
 
-<!-- Journal Workspace -->
 <div class="max-w-4xl mx-auto mb-24" id="diary-card" style="transform: none;">
     <div class="relative bg-white rounded-xl shadow-xl overflow-hidden border border-outline-variant/30 paper-texture">
         <div class="washi-tape absolute top-4 -left-4 w-32 h-8 bg-primary-container/40 z-30"></div>
         <div class="washi-tape absolute -top-2 -right-6 w-24 h-10 bg-tertiary-fixed/30 z-30 rotate-12"></div>
         <div class="p-8 md:p-12">
-            <!-- Date + Title -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b-2 border-dashed border-primary-fixed pb-6">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary text-4xl">calendar_today</span>
@@ -620,19 +583,16 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
                     <input id="diary-title-input"
                         class="w-full md:w-64 bg-transparent border-none focus:ring-0 font-headline-md text-on-primary-container placeholder:text-outline/50 border-b border-outline-variant"
                         placeholder="Título de mi día..." type="text">
-                    <!-- Autosave indicator -->
                     <span id="autosave-indicator" class="hidden text-outline font-label-sm whitespace-nowrap flex items-center gap-1">
                         <span class="material-symbols-outlined text-[14px]">cloud_done</span> Borrador guardado
                     </span>
                 </div>
             </div>
-            <!-- Writing Area -->
             <div class="relative min-h-[400px]">
                 <textarea id="diary-body-input"
                     class="w-full h-full min-h-[400px] bg-transparent border-none focus:ring-0 font-body-lg text-on-surface notebook-lines resize-none p-0"
                     placeholder="Querido diario..."></textarea>
             </div>
-            <!-- Actions -->
             <div class="mt-12 flex flex-wrap justify-center gap-4">
                 <button id="diary-save-btn" type="button"
                     class="group relative flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-full font-headline-md shadow-lg hover:bg-tertiary hover:scale-105 transition-all duration-300">
@@ -646,7 +606,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
                     Nueva entrada
                 </button>
             </div>
-            <!-- Save feedback toast -->
             <div id="diary-toast"
                 class="hidden mt-6 mx-auto max-w-xs text-center bg-tertiary-container text-on-tertiary-container font-label-md px-6 py-3 rounded-full shadow transition-all">
                 ✨ ¡Recuerdo guardado!
@@ -655,7 +614,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </div>
 
-<!-- Export / Import bar -->
 <div class="max-w-6xl mx-auto mb-12">
     <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-container-low rounded-xl px-6 py-4 border border-outline-variant/30">
         <p class="font-label-md text-on-surface-variant flex items-center gap-2">
@@ -677,23 +635,19 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </div>
 
-<!-- Past Memories Section -->
 <section class="max-w-6xl mx-auto">
     <div class="flex items-center gap-4 mb-10">
         <h2 class="font-display-lg text-headline-lg text-primary">Mis Memorias</h2>
         <div class="h-px flex-grow bg-gradient-to-r from-primary-fixed to-transparent"></div>
         <span id="diary-count" class="font-label-sm text-outline italic"></span>
     </div>
-    <!-- Empty state -->
     <div id="diary-empty" class="hidden text-center py-16">
         <span class="material-symbols-outlined text-6xl text-primary-fixed-dim" style="font-variation-settings:'FILL' 1;">auto_stories</span>
         <p class="font-body-lg text-on-surface-variant mt-4">Todavía no hay memorias guardadas.<br>¡Escribe tu primera entrada!</p>
     </div>
-    <!-- Entries grid -->
     <div id="diary-entries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"></div>
 </section>
 
-<!-- Modal: read full entry -->
 <div id="diary-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-on-surface/30 backdrop-blur-sm" id="diary-modal-backdrop"></div>
     <div class="relative bg-white rounded-xl shadow-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto paper-texture border border-outline-variant/30 p-8 md:p-10 z-10">
@@ -720,10 +674,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </main>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════ -->
-<!--              LIGHTBOX GALERÍA                   -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="gallery-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="absolute inset-0 bg-on-surface/70 backdrop-blur-sm" id="gallery-lightbox-backdrop"></div>
     <div class="relative z-10 max-w-5xl max-h-[90vh] w-full flex flex-col items-center">
@@ -734,9 +684,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!--                  FOOTER (shared)                -->
-<!-- ═══════════════════════════════════════════════ -->
 <footer class="bg-secondary-container rounded-t-xl border-t-2 border-dashed border-outline-variant relative z-20">
     <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-12 gap-gutter max-w-7xl mx-auto">
         <div class="flex flex-col gap-4">
@@ -747,15 +694,8 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 </footer>
 
-
-
-
-<!-- ═══════════════════════════════════════════════ -->
-<!--         WIDGET FLOTANTE: SPOTIFY              -->
-<!-- ═══════════════════════════════════════════════ -->
 <div id="music-widget">
 
-    <!-- Panel Spotify -->
     <div id="mw-spotify-panel" class="music-panel w-[340px] relative">
         <button id="mw-close-spotify" type="button" class="absolute -top-3 -right-3 z-20 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-outline hover:text-tertiary transition-colors border border-outline-variant/20">
             <span class="material-symbols-outlined text-[18px]">close</span>
@@ -769,7 +709,6 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
                 class="rounded-xl shadow-xl"></iframe>
     </div>
 
-    <!-- Caja musical trigger -->
     <div id="music-box-btn" title="Mi música">
         <div class="relative">
             <div class="absolute -top-3 -left-3 washi-tape px-2 py-0.5 text-on-primary-container text-[10px] font-label-sm z-20 rounded-sm whitespace-nowrap" id="mw-washi-label">
@@ -785,28 +724,22 @@ body.no-select { user-select: none !important; -webkit-user-select: none !import
     </div>
 
 </div>
+
 <script>
 // ─── SPA Router ───────────────────────────────────
 function navigateTo(page) {
-    // Hide all pages
     document.querySelectorAll('.spa-page').forEach(p => p.classList.remove('active'));
-    // Show target
     const target = document.getElementById('page-' + page);
     if (target) target.classList.add('active');
-    // Update nav active state
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.toggle('active-page', link.dataset.page === page);
     });
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Update URL hash
     history.pushState(null, '', '#' + page);
-    // Re-init page-specific scripts
     if (page === 'diario') initDiaryScript();
     if (page === 'home') initStickyNotes();
 }
 
-// Nav click handlers
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -814,13 +747,11 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-// Handle browser back/forward
 window.addEventListener('popstate', () => {
     const page = location.hash.replace('#','') || 'home';
     navigateTo(page);
 });
 
-// Initial page from URL hash
 const initialPage = location.hash.replace('#','') || 'home';
 navigateTo(initialPage);
 
@@ -874,7 +805,6 @@ let editingId        = null;
 let autosaveTimer    = null;
 let storageAvailable = false;
 
-// ── Storage availability check ──────────────────
 function checkStorage() {
     try {
         localStorage.setItem('__test__', '1');
@@ -897,14 +827,12 @@ function diarySave(entries) {
     localStorage.setItem(DIARY_KEY, JSON.stringify(entries));
 }
 
-// ── Draft (autosave) helpers ────────────────────
 function draftSave() {
     if (!storageAvailable) return;
     const title = document.getElementById('diary-title-input').value;
     const body  = document.getElementById('diary-body-input').value;
     if (!title && !body) { draftClear(); return; }
     localStorage.setItem(DIARY_DRAFT_KEY, JSON.stringify({ title, body, editingId, ts: Date.now() }));
-    // Show "Borrador guardado" indicator briefly
     const ind = document.getElementById('autosave-indicator');
     ind.classList.remove('hidden');
     clearTimeout(autosaveTimer);
@@ -923,7 +851,6 @@ function draftClear() {
     document.getElementById('diary-draft-banner').classList.add('hidden');
 }
 
-// ── UI helpers ──────────────────────────────────
 function formatDate(iso) {
     const d = new Date(iso);
     return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
@@ -940,7 +867,6 @@ function escHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Render entries grid ─────────────────────────
 function renderEntries() {
     const entries = diaryLoad();
     const grid    = document.getElementById('diary-entries-grid');
@@ -975,15 +901,14 @@ function renderEntries() {
     });
 }
 
-// ── Modal ───────────────────────────────────────
 function openModal(id) {
     const entry = diaryLoad().find(e => e.id === id);
     if (!entry) return;
     document.getElementById('modal-date').textContent  = formatDate(entry.date);
     document.getElementById('modal-title').textContent = entry.title || 'Sin título';
     document.getElementById('modal-body').textContent  = entry.body || '';
-    document.getElementById('modal-edit-btn').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); loadEntryIntoEditor(id); });
-    document.getElementById('modal-delete-btn').addEventListener('pointerdown', function(e) { e.preventDefault(); deleteEntry(id); });
+    document.getElementById('modal-edit-btn').onclick = function(e) { e.preventDefault(); closeModal(); loadEntryIntoEditor(id); };
+    document.getElementById('modal-delete-btn').onclick = function(e) { e.preventDefault(); deleteEntry(id); };
     document.getElementById('diary-modal').classList.remove('hidden');
 }
 
@@ -991,7 +916,6 @@ function closeModal() {
     document.getElementById('diary-modal').classList.add('hidden');
 }
 
-// ── Editor helpers ──────────────────────────────
 function loadEntryIntoEditor(id) {
     const entry = diaryLoad().find(e => e.id === id);
     if (!entry) return;
@@ -1011,6 +935,7 @@ function deleteEntry(id) {
     renderEntries();
 }
 
+// Limpiar el editor al guardar/cancelar
 function clearEditor() {
     document.getElementById('diary-title-input').value = '';
     document.getElementById('diary-body-input').value  = '';
@@ -1020,11 +945,8 @@ function clearEditor() {
         '<span class="material-symbols-outlined group-hover:animate-bounce">auto_awesome</span> Guardar Recuerdo';
 }
 
-// ── Main init ───────────────────────────────────
 let diaryInitialized = false;
 function initDiaryScript() {
-    // Guard: solo inicializar event listeners una vez
-    // renderEntries() sí se llama siempre para refrescar datos
     if (diaryInitialized) {
         checkStorage();
         renderEntries();
@@ -1035,19 +957,17 @@ function initDiaryScript() {
     diaryInitialized = true;
     checkStorage();
 
-    // Today's date
     document.getElementById('diary-date-display').textContent =
         new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
 
     renderEntries();
 
-    // ── Draft recovery on load ──
     const draft = draftLoad();
     if (draft && (draft.title || draft.body)) {
         const banner = document.getElementById('diary-draft-banner');
         banner.classList.remove('hidden');
 
-        document.getElementById('draft-restore-btn').addEventListener('pointerdown', function(e) {
+        document.getElementById('draft-restore-btn').onclick = function(e) {
             e.preventDefault();
             document.getElementById('diary-title-input').value = draft.title || '';
             document.getElementById('diary-body-input').value  = draft.body  || '';
@@ -1058,16 +978,15 @@ function initDiaryScript() {
             }
             banner.classList.add('hidden');
             showToast('📝 Borrador recuperado');
-        });
+        };
 
-        document.getElementById('draft-discard-btn').addEventListener('pointerdown', function(e) {
+        document.getElementById('draft-discard-btn').onclick = function(e) {
             e.preventDefault();
             draftClear();
             banner.classList.add('hidden');
-        });
+        };
     }
 
-    // ── Autosave on every keystroke (debounced 1.5s) ──
     let debounce;
     const autoSaveTrigger = () => {
         clearTimeout(debounce);
@@ -1076,9 +995,9 @@ function initDiaryScript() {
     document.getElementById('diary-title-input').addEventListener('input', autoSaveTrigger);
     document.getElementById('diary-body-input').addEventListener('input', autoSaveTrigger);
 
-    // ── Save / Update button ──
     const saveBtn = document.getElementById('diary-save-btn');
-    saveBtn.addEventListener('click', function(e) {
+    saveBtn.onclick = function(e) {
+        e.preventDefault();
         e.stopPropagation();
         const title = document.getElementById('diary-title-input').value.trim();
         const body  = document.getElementById('diary-body-input').value.trim();
@@ -1096,21 +1015,19 @@ function initDiaryScript() {
         clearEditor();
         renderEntries();
         showToast(editingId ? '✏️ ¡Entrada actualizada!' : '✨ ¡Recuerdo guardado!');
-    });
+    };
 
-    // ── New entry ──
     const newBtn = document.getElementById('diary-new-btn');
-    newBtn.addEventListener('click', function(e) {
+    newBtn.onclick = function(e) {
+        e.preventDefault();
         clearEditor();
-    });
+    };
 
-    // ── Modal close ──
-    document.getElementById('diary-modal-close').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); });
-    document.getElementById('diary-modal-backdrop').addEventListener('pointerdown', function(e) { e.preventDefault(); closeModal(); });
+    document.getElementById('diary-modal-close').onclick = function(e) { e.preventDefault(); closeModal(); };
+    document.getElementById('diary-modal-backdrop').onclick = function(e) { e.preventDefault(); closeModal(); };
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // ── Export ──
-    document.getElementById('diary-export-btn').addEventListener('pointerdown', function(e) {
+    document.getElementById('diary-export-btn').onclick = function(e) {
         e.preventDefault();
         const data = localStorage.getItem(DIARY_KEY) || '[]';
         const blob = new Blob([data], { type: 'application/json' });
@@ -1119,9 +1036,8 @@ function initDiaryScript() {
         a.download = `rincon-haru-diario-${new Date().toISOString().slice(0,10)}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
-    });
+    };
 
-    // ── Import ──
     document.getElementById('diary-import-input').onchange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -1145,7 +1061,6 @@ function initDiaryScript() {
         reader.readAsText(file);
     };
 
-    // ── Card tilt effect ──
     const journalCard = document.getElementById('diary-card');
     if (!journalCard) return;
     journalCard.addEventListener('mousemove', (e) => {
@@ -1171,8 +1086,6 @@ function initStickyNotes() {
     });
 }
 
-
-
 // ─── Widget flotante: Spotify ───────────────────
 const mwBoxBtn       = document.getElementById('music-box-btn');
 const mwSpotifyPanel = document.getElementById('mw-spotify-panel');
@@ -1187,8 +1100,8 @@ function mwHide(panel) {
     panel.classList.remove('settled');
 }
 
-// Usar pointerdown para respuesta inmediata en móvil
-mwBoxBtn.addEventListener('click', function(e) {
+mwBoxBtn.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
     if (mwSpotifyPanel.classList.contains('visible')) {
         mwHide(mwSpotifyPanel);
     } else {
@@ -1196,10 +1109,11 @@ mwBoxBtn.addEventListener('click', function(e) {
     }
 });
 
-mwCloseSpotify.addEventListener('click', function(e) {
+mwCloseSpotify.addEventListener('pointerdown', function(e) {
     e.stopPropagation();
     mwHide(mwSpotifyPanel);
 });
+
 // ─── Gallery Lightbox ───────────────────────────
 (function() {
     const lightbox = document.getElementById('gallery-lightbox');
@@ -1208,10 +1122,8 @@ mwCloseSpotify.addEventListener('click', function(e) {
     const lbBack   = document.getElementById('gallery-lightbox-backdrop');
     if (!lightbox) return;
 
-    // Usar pointerdown para móvil + PC. Más rápido y confiable que click.
     document.querySelectorAll('.gallery-item').forEach(item => {
         item.addEventListener('pointerdown', function(e) {
-            // Solo botón izquierdo o touch
             if (e.button !== 0 && e.button !== -1) return;
             const img = item.querySelector('img');
             if (img && img.src) {
@@ -1232,7 +1144,6 @@ mwCloseSpotify.addEventListener('click', function(e) {
     lbBack.addEventListener('click', closeLb);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLb(); });
 
-    // Soporte swipe-down para cerrar en móvil
     let lbTouchStartY = 0;
     lightbox.addEventListener('touchstart', e => { lbTouchStartY = e.touches[0].clientY; }, { passive: true });
     lightbox.addEventListener('touchend', e => {
