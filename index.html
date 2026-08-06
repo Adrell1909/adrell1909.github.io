@@ -1,1187 +1,380 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="es">
+<html lang="es">
+
 <head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Rincón de Haru</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<style>
-    @font-face { font-family: 'Quicksand'; font-style: normal; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Una sorpresa para ti</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-        background-color: #f9f9f9;
-        background-image: radial-gradient(#ffd9df 0.5px, transparent 0.5px);
-        background-size: 24px 24px;
-        overflow-x: hidden;
+      /* Fondo con imagen de galaxia/nebulosa + degradado superpuesto para no perder contraste */
+      background: linear-gradient(rgba(6, 6, 8, 0.75), rgba(6, 6, 8, 0.75)),
+        url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1600&auto=format&fit=crop') no-repeat center center fixed;
+      background-size: cover;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    .paper-texture {
-        background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+    /* --- CAPA DE LLUVIA DE ESTRELLA FUGAZ / PARTÍCULAS --- */
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .notebook-lines {
-        background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
-        background-size: 100% 2.5rem;
-        line-height: 2.5rem;
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: fall linear infinite;
     }
 
-    .cloud {
-        position: absolute;
-        background: white;
-        border-radius: 100px;
-        opacity: 0.6;
-        filter: blur(20px);
-        z-index: -1;
-        animation: drift var(--duration) linear infinite;
-    }
-
-    @keyframes drift {
-        from { transform: translateX(-300px); }
-        to { transform: translateX(calc(100vw + 300px)); }
-    }
-
-    .particle {
-        position: fixed;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 5;
-        animation: floatUp var(--p-duration) ease-in infinite;
-    }
-
-    @keyframes floatUp {
-        0% { transform: translateY(110vh) scale(0); opacity: 0; }
-        20% { opacity: 0.6; }
-        80% { opacity: 0.6; }
-        100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-    }
-
-    @keyframes subtleFloat {
-        0%, 100% { transform: translateY(0) rotate(var(--base-rotation, 0deg)); }
-        50% { transform: translateY(-15px) rotate(calc(var(--base-rotation, 0deg) + 1deg)); }
-    }
-
-    .animate-float { animation: subtleFloat 6s ease-in-out infinite; }
-    .animate-float-delayed { animation: subtleFloat 8s ease-in-out infinite; animation-delay: 1s; }
-
-    @media (prefers-reduced-motion: reduce) {
-        .cloud, .particle, .animate-float, .animate-float-delayed, .animate-bounce {
-            animation: none !important;
-            display: none !important;
-        }
-        .transition-all, .transition-transform, .transition-opacity { transition: none !important; }
-    }
-
-    .lace-border {
-        background-image: radial-gradient(circle at 10px 0, transparent 10px, white 11px);
-        background-size: 20px 10px;
-        height: 10px;
-        width: 100%;
-    }
-
-    .washi-tape {
-        background: rgba(255, 193, 204, 0.5);
-        transform: rotate(-3deg);
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-        backdrop-filter: blur(2px);
-    }
-
-    .polaroid-frame {
-        padding: 12px 12px 40px 12px;
-        background: white;
-        box-shadow: 0px 10px 30px rgba(255, 193, 204, 0.2);
-        transition: transform 0.3s ease;
-    }
-
-    .polaroid-frame:hover { transform: scale(1.02) rotate(1deg); }
-
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-
-    .scallop-divider {
-        mask-image: radial-gradient(circle at 10px 0, transparent 10px, black 11px);
-        mask-size: 20px 20px;
-    }
-
-    /* ── Touch: eliminar delay de 300ms en todos los elementos interactivos ── */
-    button, a, label, input, textarea, select,
-    [role="button"], .cursor-pointer, nav a {
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: rgba(129, 81, 91, 0.15);
-    }
-    /* ── Active states para feedback táctil visible ── */
-    button:active, a:active, .cursor-pointer:active {
-        opacity: 0.75;
-        transform: scale(0.97);
-    }
-
-    /* SPA page transitions */
-    .spa-page {
-        display: none;
-        animation: fadeInPage 0.35s ease;
-    }
-
-    .spa-page.active {
-        display: block;
-    }
-
-    @keyframes fadeInPage {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Active nav link style */
-    .nav-link { transition: all 0.3s; }
-    .nav-link.active-page {
-        color: #ba1340 !important;
-        font-weight: 700;
-        border-bottom: 2px solid #ba1340;
-        padding-bottom: 4px;
-    }
-
-    /* ── Widget de música flotante ── */
-    #music-widget {
-        position: fixed;
-        bottom: 28px;
-        right: 28px;
-        z-index: 200;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
-        pointer-events: none;
-    }
-
-    #music-box-btn {
-        cursor: pointer;
-        user-select: none;
-        position: relative;
-        filter: drop-shadow(0 6px 16px rgba(255,193,204,0.55));
-        transition: transform 0.25s ease, filter 0.25s ease;
-        pointer-events: auto;
-    }
-    #music-box-btn:hover { transform: translateY(-4px) scale(1.04); }
-
-    @keyframes boxGlow {
-        0%,100% { filter: drop-shadow(0 6px 16px rgba(255,193,204,0.55)); }
-        50%      { filter: drop-shadow(0 6px 28px rgba(186,19,64,0.35)); }
-    }
-    #music-box-btn.playing { animation: boxGlow 2.2s ease-in-out infinite; }
-
-    .music-panel {
+    @keyframes fall {
+      0% {
+        transform: translateY(-10px) translateX(0);
         opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px) scale(0.96);
-        pointer-events: none;
-        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
-        transform-origin: bottom right;
-    }
-    .music-panel.visible {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0) scale(1);
-        pointer-events: all;
-    }
-    .music-panel.settled {
-        transform: none;
+      }
+
+      20% {
+        opacity: 0.9;
+      }
+
+      100% {
+        transform: translateY(100vh) translateX(50px);
+        opacity: 0;
+      }
     }
 
-    .paper-notebook {
-        background-color: #fff;
-        background-image:
-            linear-gradient(90deg, transparent 48px, #abced4 48px, #abced4 50px, transparent 50px),
-            linear-gradient(#eee .1em, transparent .1em);
-        background-size: 100% 1.4rem;
+    .container {
+      text-align: center;
+      position: relative;
+      width: 90%;
+      max-width: 600px;
+      z-index: 1;
+      /* Por encima de las estrellas */
     }
 
-    .song-row { transition: background 0.15s ease; cursor: pointer; }
-    .song-row:hover { background: rgba(255,217,223,0.35); border-radius: 4px; }
-    .song-row.active { background: rgba(255,217,223,0.55); border-radius: 4px; }
+    .flower-wrapper {
+      cursor: pointer;
+      margin: 20px auto;
+      width: 320px;
+      height: 320px;
+      transition: transform 0.4s ease;
+      position: relative;
+    }
 
-#music-box-btn { cursor: pointer; }
-#mw-player, #mw-playlist { will-change: transform; }
-.panel-dragging { transition: none !important; animation: none !important; }
-body.no-select { user-select: none !important; -webkit-user-select: none !important; }
+    .flower-wrapper:hover {
+      transform: scale(1.04);
+    }
 
-/* ═══ MOBILE FIXES ═══ */
-@media (hover: none) and (pointer: coarse) {
-    button:active, a:active, .cursor-pointer:active,
-    .polaroid-frame:active, .gallery-item:active {
-        transform: none !important;
-        opacity: 1 !important;
+    /* --- ESTILOS DE DIBUJO Y FLOR --- */
+    .stem-base {
+      stroke: #224227;
+      stroke-width: 4.5;
+      stroke-linecap: round;
+      fill: none;
     }
-    .gallery-item .absolute.inset-0 {
-        opacity: 1 !important;
-        background: rgba(129, 81, 91, 0.15) !important;
-    }
-    header button:active {
-        transform: none !important;
-    }
-    .w-64.shadow-md:active {
-        transform: scale(0.98) !important;
-    }
-}
 
-/* Fix específico para iOS Safari iframe */
-@supports (-webkit-touch-callout: none) {
-    .music-panel.visible {
-        transform: none !important;
+    .receptacle {
+      fill: #2d5433;
+      stroke: #19331e;
+      stroke-width: 1;
     }
-    .music-panel iframe {
-        -webkit-transform: translateZ(0);
-    }
-}
 
-.gallery-item {
-    -webkit-tap-highlight-color: rgba(129, 81, 91, 0.2);
-}
-
-#diary-save-btn, #diary-new-btn,
-#draft-restore-btn, #draft-discard-btn,
-#modal-edit-btn, #modal-delete-btn,
-#diary-export-btn {
-    touch-action: manipulation;
-}
-</style>
-<script id="tailwind-config">
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                "colors": {
-                    "on-primary-container": "#7b4c56",
-                    "surface": "#f9f9f9",
-                    "on-primary": "#ffffff",
-                    "on-error": "#ffffff",
-                    "surface-bright": "#f9f9f9",
-                    "on-tertiary-fixed": "#40000f",
-                    "surface-container-highest": "#e2e2e2",
-                    "surface-container": "#eeeeee",
-                    "on-primary-fixed": "#331019",
-                    "surface-container-high": "#e8e8e8",
-                    "secondary-fixed": "#f7ddda",
-                    "on-surface": "#1a1c1c",
-                    "surface-dim": "#dadada",
-                    "outline": "#837375",
-                    "surface-variant": "#e2e2e2",
-                    "tertiary": "#ba1340",
-                    "on-secondary-fixed": "#261817",
-                    "primary-fixed-dim": "#f3b7c1",
-                    "primary-fixed": "#ffd9df",
-                    "on-tertiary-fixed-variant": "#91002d",
-                    "inverse-surface": "#2f3131",
-                    "error": "#ba1a1a",
-                    "on-secondary-container": "#725e5c",
-                    "secondary-container": "#f4dad7",
-                    "on-surface-variant": "#514345",
-                    "primary": "#81515b",
-                    "on-primary-fixed-variant": "#663a43",
-                    "on-error-container": "#93000a",
-                    "tertiary-container": "#ffc2c6",
-                    "inverse-primary": "#f3b7c1",
-                    "inverse-on-surface": "#f0f1f1",
-                    "tertiary-fixed": "#ffdadb",
-                    "background": "#f9f9f9",
-                    "on-background": "#1a1c1c",
-                    "secondary": "#6d5a58",
-                    "surface-tint": "#81515b",
-                    "surface-container-low": "#f3f3f4",
-                    "on-tertiary-container": "#b3093b",
-                    "on-secondary": "#ffffff",
-                    "outline-variant": "#d5c2c4",
-                    "tertiary-fixed-dim": "#ffb2b8",
-                    "surface-container-lowest": "#ffffff",
-                    "error-container": "#ffdad6",
-                    "secondary-fixed-dim": "#dac1be",
-                    "primary-container": "#ffc1cc",
-                    "on-secondary-fixed-variant": "#544341",
-                    "on-tertiary": "#ffffff"
-                },
-                "borderRadius": {
-                    "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"
-                },
-                "spacing": {
-                    "margin-desktop": "64px", "margin-mobile": "16px",
-                    "gutter": "24px", "base": "8px", "stack-gap": "12px"
-                },
-                "fontFamily": {
-                    "headline-md": ["Quicksand"], "label-sm": ["Quicksand"],
-                    "body-lg": ["Be Vietnam Pro"], "display-lg": ["Quicksand"],
-                    "label-md": ["Quicksand"], "body-md": ["Be Vietnam Pro"],
-                    "headline-lg-mobile": ["Quicksand"], "headline-lg": ["Quicksand"]
-                },
-                "fontSize": {
-                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
-                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                    "label-md": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
-                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                    "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "700"}],
-                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "700"}]
-                }
-            }
-        }
+    .initial-bud {
+      fill: #8a0c1a;
+      stroke: #e62335;
+      stroke-width: 1.5;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      animation: pulse 2s infinite alternate ease-in-out;
+      transform-origin: 150px 180px;
     }
-</script>
+
+    @keyframes pulse {
+      0% {
+        filter: drop-shadow(0 0 4px rgba(230, 35, 53, 0.4));
+      }
+
+      100% {
+        filter: drop-shadow(0 0 16px rgba(230, 35, 53, 0.9));
+      }
+    }
+
+    .bloomed .initial-bud {
+      opacity: 0;
+      transform: scale(0);
+      animation: none;
+    }
+
+    .petal-path {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 250;
+      stroke-dashoffset: 250;
+      transition: stroke-dashoffset 1.8s ease, fill-opacity 1.5s ease;
+      fill-opacity: 0;
+    }
+
+    .layer-back {
+      stroke: #730612;
+      fill: #420208;
+    }
+
+    .layer-mid-back {
+      stroke: #ad0c1f;
+      fill: #660612;
+    }
+
+    .layer-mid-front {
+      stroke: #e62335;
+      fill: #940a18;
+    }
+
+    .layer-front {
+      stroke: #ff3c50;
+      fill: #c41024;
+      stroke-width: 1.8;
+    }
+
+    .stamen-path {
+      stroke: #ff4d61;
+      stroke-width: 1;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      transition: stroke-dashoffset 1.5s ease;
+    }
+
+    .anther {
+      fill: #ffd700;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .bloomed .petal-path {
+      stroke-dashoffset: 0;
+      fill-opacity: 0.75;
+    }
+
+    .bloomed .layer-back {
+      transition-delay: 0.2s;
+    }
+
+    .bloomed .layer-mid-back {
+      transition-delay: 0.5s;
+    }
+
+    .bloomed .layer-mid-front {
+      transition-delay: 0.8s;
+    }
+
+    .bloomed .layer-front {
+      transition-delay: 1.1s;
+    }
+
+    .bloomed .stamen-path {
+      stroke-dashoffset: 0;
+      transition-delay: 1.8s;
+    }
+
+    .bloomed .anther {
+      opacity: 1;
+      transition-delay: 3s;
+    }
+
+    /* --- TEXTOS Y CARTA CON EFECTO VIDRIO CRISTAL --- */
+    .instruction {
+      color: #ff3c50;
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 10px;
+      transition: opacity 0.5s;
+      text-shadow: 0 0 10px rgba(255, 60, 80, 0.6);
+    }
+
+    .letter-card {
+      opacity: 0;
+      transform: translateY(30px);
+      pointer-events: none;
+      transition: all 1s ease 3.4s;
+      background: rgba(15, 8, 12, 0.65);
+      border: 1px solid rgba(230, 35, 53, 0.4);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(230, 35, 53, 0.2);
+      margin-top: 20px;
+    }
+
+    .letter-card.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .letter-card h2 {
+      color: #ff5263;
+      margin-bottom: 15px;
+      font-weight: 300;
+    }
+
+    .letter-card p {
+      line-height: 1.8;
+      color: #e0e0e0;
+      font-size: 1rem;
+    }
+  </style>
 </head>
-<body class="font-body-md text-on-surface">
 
-<!-- Atmospheric Background Layer -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none z-0" id="cloud-container"></div>
-<div class="fixed inset-0 overflow-hidden pointer-events-none z-10" id="particle-container"></div>
+<body>
 
-<!-- HEADER (shared) -->
-<header class="bg-white/80 backdrop-blur-md border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop py-4 shadow-[0px_20px_40px_rgba(255,193,204,0.3)] top-0 sticky z-50">
-    <div class="font-display-lg text-headline-lg text-primary tracking-tight">Rincon de Haru</div>
-    <nav class="hidden md:flex gap-8 items-center">
-        <a href="#" class="nav-link text-on-surface-variant font-label-md hover:text-tertiary hover:scale-105" data-page="home">Home</a>
-        <a href="#" class="nav-link text-on-surface-variant font-label-md hover:text-tertiary hover:scale-105" data-page="aventura">Aventura</a>
-        <a href="#" class="nav-link text-on-surface-variant font-label-md hover:text-tertiary hover:scale-105" data-page="diario">Diario</a>
-    </nav>
-    <!-- Mobile nav -->
-    <nav class="flex md:hidden gap-4 items-center">
-        <a href="#" class="nav-link text-on-surface-variant font-label-sm hover:text-tertiary" data-page="home">Home</a>
-        <a href="#" class="nav-link text-on-surface-variant font-label-sm hover:text-tertiary" data-page="aventura">Aventura</a>
-        <a href="#" class="nav-link text-on-surface-variant font-label-sm hover:text-tertiary" data-page="diario">Diario</a>
-    </nav>
-    <div class="flex gap-4 items-center">
-        <button class="text-primary hover:text-tertiary transition-colors scale-100 active:scale-95 duration-150">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
-        </button>
-    </div>
-</header>
+  <!-- Contenedor dinámico de estrellas en movimiento -->
+  <div class="starfield" id="starfield"></div>
 
-<!-- PAGE: HOME -->
-<div id="page-home" class="spa-page active">
-    <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
+  <div class="container">
+    <div class="flower-wrapper" id="flower">
+      <svg viewBox="0 0 300 300" width="320" height="320">
 
-<!-- Hero Section -->
-<section class="flex flex-col items-center justify-center text-center py-20 min-h-[716px]">
-<div class="relative max-w-4xl">
-<!-- Decorative Elements -->
-<div class="absolute -top-12 -left-8 animate-bounce" style="animation-duration: 3s;">
-<span class="material-symbols-outlined text-6xl text-primary-container" style="font-variation-settings: 'FILL' 1;">favorite</span>
-</div>
-<h1 class="font-display-lg text-headline-lg md:text-[64px] text-on-primary-container mb-6 drop-shadow-sm">Rincon de Haru</h1>
-<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12">Un pequeño rincón del mundo digital donde encontrarás tus memorias, notas y momentos que te gusten.</p>
-<!-- Central Illustration Placeholder -->
-<div class="relative inline-block mx-auto group animate-float">
-<div class="absolute inset-0 bg-primary-container blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
-<div class="relative bg-white p-8 rounded-full border-4 border-primary-container/30 shadow-xl overflow-hidden">
-<img class="w-72 h-72 md:w-96 md:h-96 object-cover rounded-full" data-alt="A whimsical, dreamy illustration of a cute bunny character with a pink bow, surrounded by soft clouds, pastel hearts, and twinkling stars. The art style is soft and painterly with a focus on nostalgic kawaii aesthetics and a warm, glowing color palette of soft pinks and creams." src="./images/hero/profile.jpeg">
-</div>
-<!-- Ribbon Accents -->
-<div class="absolute -bottom-4 -right-4 bg-tertiary text-white px-6 py-2 rounded-full font-label-md shadow-lg rotate-12 transition-transform hover:scale-110">¡Feliz día!</div>
-</div>
-</div>
-</section>
-<!-- Our Moments: Polaroid Grid -->
-<section class="mt-24">
-<div class="flex items-center gap-4 mb-12">
-<h2 class="font-headline-lg text-primary">Hobbies y Momentos favoritos</h2>
-<div class="h-[2px] flex-grow bg-dashed border-t-2 border-primary-container/50"></div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-<!-- Polaroid 1 -->
-<div class="relative animate-float" style="--base-rotation: -2deg;">
-<div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
-<div class="polaroid-frame">
-<img class="w-full aspect-square object-cover" data-alt="A romantic picnic setting at sunset with a woven basket, fresh strawberries, and pink roses on a checked blanket." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPxTy9PBPK6jMKOpCZlwY49xhR_iiRGk64lyLv6NU--0Di-sl7vYVhXU6Q2hItdBkcicYyK9hJ24xhjnPauKln7_PAmbcqAJob-xGaNWrc6vwppErvsJT2uYmTprUxP6Dgp5pFXSDKYjb40r7_Fyz9yvf4UmAnlovq_I1q06xl5IKjyAYuTlWyI_lFjKVjxRuJvhB7GdZbzD8BqkQhW0CVqG0C2Ec7drJzy-koeFqTM8MQ8t2SP6V28ma9ivZITCl5hBP7PVtNWuI1">
-<div class="mt-4 font-label-md text-center text-secondary">Invierno</div>
-</div>
-</div>
-<!-- Polaroid 2 -->
-<div class="relative mt-8 md:mt-12 animate-float-delayed" style="--base-rotation: 3deg;">
-<div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
-<div class="polaroid-frame">
-<img class="w-full aspect-square object-cover" data-alt="Close up of a handwritten letter and a vintage fountain pen on a desk." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnOLGf-SjsmA9C9FFTTY3e_mG6dYTA1x9ZHvLBGhR8KTg07_QM5n6y5Bk7hynmvwZRbk_sA2DhDFGQxlBI37H_1B5aWuhsM6ctMPSjATW9-8Cjv32XwuUAdDu9ZIDzZoPI6dYN49-WObC_eAV_TCFooDIV9ZefnRh1XL2ruH3Nsl_r63agFYC4yL2TXhrcSPdnJnEuK1Qo87AZyK5ETx9qdIt6BxXsAI8bd4V7siQ5O28ek1fP3ng1bdm5mj77JmfTpfyEwQ1khw">
-<div class="mt-4 font-label-md text-center text-secondary">Escribir</div>
-</div>
-</div>
-<!-- Polaroid 3 -->
-<div class="relative md:-mt-8 animate-float" style="--base-rotation: -1deg;">
-<div class="washi-tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-8 z-20"></div>
-<div class="polaroid-frame">
-<img class="w-full aspect-square object-cover" data-alt="Two hands holding pink heart-shaped balloons against a clear, soft blue sky." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoqz_DQP6YltoJGnoALbWMGLVDR5QogPvPdjJXyELAgKY_wGR0i2JrRjvhVJAhQZek6fGXOEIRivHDmkS4igusXwSWI-lzqQ9XdPyyofvLnEcd-GcEnUyjTZJdcCwZb7Lsn6snQa-unxqpWhc-mNDscHpbtwTjMwtr2tTCavzWwAfKNwZY70_PcLSewa4hlKLrKGuY9_hV1nzfNLxdJYIXbFOXRJ--rtiHQzsdW3tNvXYgyZuYqbivcZQTaSiu66LNwA-hnYE1s0y9">
-<div class="mt-4 font-label-md text-center text-secondary">Maquillaje</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Daily Whispers: Sticky Notes -->
-<section class="mt-32">
-<div class="bg-secondary-container/30 rounded-xl p-8 md:p-12 relative overflow-hidden">
-<!-- Scallop Top -->
-<div class="absolute top-0 left-0 w-full h-4 lace-border opacity-50"></div>
-<h2 class="font-headline-lg text-on-secondary-container mb-8 text-center">Susurros Diarios</h2>
-<div class="flex flex-wrap justify-center gap-8">
-<!-- Sticky Note 1 -->
-<div class="w-64 bg-[#fff9c4] p-6 shadow-md -rotate-3 transition-transform" style="transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-<div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
-</div>
-<p class="font-body-md text-on-surface italic">"Lo más bonito que puedes llevar es una sonrisa desde el corazón"</p>
-<div class="mt-4 text-right text-label-sm text-secondary">- Melody</div>
-</div>
-<!-- Sticky Note 2 -->
-<div class="w-64 bg-[#ffe4e1] p-6 shadow-md rotate-2 transition-transform" style="transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-<div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
-</div>
-<p class="font-body-md text-on-surface italic">"Tu carisma y gran corazón ayudan a los demás a avanzar."</p>
-<div class="mt-4 text-right text-label-sm text-secondary">- Andre</div>
-</div>
-<!-- Sticky Note 3 -->
-<div class="w-64 bg-[#e1f5fe] p-6 shadow-md -rotate-1 transition-transform">
-<div class="flex justify-center mb-2">
-<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">push_pin</span>
-</div>
-<p class="font-body-md text-on-surface italic">"Amar no es solo una palabra, es el sentimiento más valioso y cálido del mundo."</p>
-<div class="mt-4 text-right text-label-sm text-secondary">- Susurros del cielo</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Gallery of Hearts: Bento Grid -->
-<section class="mt-32">
-<h2 class="font-headline-lg text-primary text-center mb-12">Galería</h2>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[150px] md:auto-rows-[200px]">
-<div class="col-span-2 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="0">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="./images/gallery/cat.jpeg">
-<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
-</div>
-</div>
-<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="1">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="./images/gallery/spotify.jpeg">
-<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
-</div>
-</div>
-<div class="col-span-1 row-span-2 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="2">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="./images/gallery/flower.jpeg">
-<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
-</div>
-</div>
-<div class="col-span-1 row-span-1 relative group overflow-hidden rounded-lg cursor-pointer gallery-item" data-gallery="3">
-<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="./images/gallery/shesbeautiful.jpeg">
-<div class="gallery-overlay absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;">search</span>
-</div>
-</div>
-</div>
-</section>
+        <path class="stem-base" d="M150,290 Q148,230 150,180" />
+        <path class="receptacle" d="M144,180 C144,188 156,188 156,180 C158,175 142,175 144,180 Z" />
 
-    </main>
-</div>
+        <g class="initial-bud">
+          <path d="M150,140 C140,160 144,180 150,180 C156,180 160,160 150,140 Z" />
+          <path d="M150,135 Q142,155 147,178" fill="none" stroke="#ff4d61" stroke-width="1" />
+          <path d="M150,135 Q158,155 153,178" fill="none" stroke="#ff4d61" stroke-width="1" />
+        </g>
 
-<!-- PAGE: AVENTURA (Timeline) -->
-<div id="page-aventura" class="spa-page">
-    <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
-<div class="relative py-16 flex flex-col items-center">
-<!-- Timeline Central Path -->
-<div class="absolute left-1/2 top-0 bottom-0 w-1 md:w-2 bg-gradient-to-b from-primary-fixed via-primary-container to-primary-fixed-dim -translate-x-1/2 opacity-40 z-0"></div>
-<div class="absolute left-1/2 top-0 bottom-0 w-0 border-r-2 border-dashed border-primary/30 -translate-x-1/2 z-0"></div>
-<!-- Timeline Content -->
-<div class="relative z-10 w-full max-w-5xl space-y-24 md:space-y-32">
-<!-- Memory Entry 1: Left -->
-<div class="flex flex-col md:flex-row items-center md:items-start w-full group">
-<div class="w-full md:w-1/2 flex justify-center md:justify-end md:pr-12">
-<div class="relative polaroid-frame transform -rotate-2 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
-<div class="washi-tape absolute -top-4 left-1/4 w-20 h-6 bg-primary-container/60 z-20"></div>
-<img alt="Memoria 1" class="w-full aspect-[4/3] object-cover mb-4 rounded-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMKKhQXQIPeuYLOFARH4f6Z9Ih6xsVcsOyYn3qf-qbBuljemwSEKdAd402TKc_5_WiOvaFTXcwdNVRX56LgEL_Q_2gDICtPaHRT8tEdYml7Bx0Pk1N65xrDeEluzhuUh3IshZJwDtuGobUBoLeUyNPIfXI0M54brNZEQ8R8TkB6Y_rnE5afWTu6ddoHbWBMW9gcE53zingj_oG-8VeNinlfrx7WxfNcT8ayfxw3SlUzSJEsbzzSUAj6f5-_WVDTAa9zgUz5gEZqQ">
-<div class="space-y-2">
-<span class="font-headline-md text-primary block">Fecha</span>
-<h3 class="font-headline-lg text-on-primary-container leading-tight">Titulo</h3>
-<p class="font-body-md text-on-surface-variant">Descripción</p>
-</div>
-<div class="absolute -bottom-3 -right-3 text-primary-container">
-<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
-</div>
-</div>
-</div>
-<div class="hidden md:block w-4 h-4 rounded-full bg-primary mt-8 shadow-lg shadow-primary/50"></div>
-<div class="w-1/2 hidden md:block"></div>
-</div>
-<!-- Memory Entry 2: Right -->
-<div class="flex flex-col md:flex-row-reverse items-center md:items-start w-full group">
-<div class="w-full md:w-1/2 flex justify-center md:justify-start md:pl-12">
-<div class="relative polaroid-frame transform rotate-3 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
-<div class="washi-tape absolute -top-4 right-1/4 w-20 h-6 bg-secondary-container/60 z-20 rotate-12"></div>
-<img alt="Memoria 2" class="w-full aspect-[4/3] object-cover mb-4 rounded-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2mcfQnok4MLBAV40quvCO6z2We5TbqN3QRb2WwJk9dp5G1MMkcZlDcUlsAAfQEGFDq-oKkJvgwcsqKGOrHBWkj2S6vOcMlwJ-zhcnDL6tcb-JNxY2uVz_yGt-yqAuGlA6PD9JT_zYHMWv5t0C-MQHIzfs51iZ_pC5dvSuIB6v8FBKoHZH8oznWckE3gGFfSJ1g5q2ZjV27YXyKZ8V6BDYyYfIj2tCRzex3SPlR7oe6pgAL1g5bd4bkfHy7CnGk_CUfbC3mrhujg">
-<div class="space-y-2">
-<span class="font-headline-md text-primary block">Fecha</span>
-<h3 class="font-headline-lg text-on-primary-container leading-tight">Titulo</h3>
-<p class="font-body-md text-on-surface-variant">Descripción</p>
-</div>
-<div class="absolute -bottom-2 -left-2 text-secondary-container">
-<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-</div>
-</div>
-</div>
-<div class="hidden md:block w-4 h-4 rounded-full bg-primary mt-8 shadow-lg shadow-primary/50"></div>
-<div class="w-1/2 hidden md:block"></div>
-</div>
-<!-- Memory Entry 3: Left -->
-<div class="flex flex-col md:flex-row items-center md:items-start w-full group">
-<div class="w-full md:w-1/2 flex justify-center md:justify-end md:pr-12">
-<div class="relative polaroid-frame transform -rotate-1 hover:rotate-0 hover:scale-105 transition-all duration-500 cursor-pointer w-72 md:w-80">
-<div class="washi-tape absolute -top-5 left-1/3 w-24 h-6 bg-tertiary-fixed/60 z-20 -rotate-3"></div>
-<img alt="Memoria 3" class="w-full aspect-[4/3] object-cover mb-4 rounded-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBezYPqBB4xnRUMLTzLNHEp0PtP3fqs4MxEhGLWAy2my8czLGskMSPaEDEygqlfXIjZ5PfTT7eQVQd6WDeT7-nziZSujYKe2lSFQioWHZXGaTkTOf2ovsE8hA3pQfKPigwGZze57XbIBhEIsffM0-xNHYKJW5EZtkjGwZjYqccpoQeL7647LDykz63mZlDFmndvB_e7Vrr7GDCFgwKwjdEcfjBu5YdzSRmst0WfFxsOrGuhCcfTj8RvHlTr6th5zGFBMUlH8BhhYA">
-<div class="space-y-2">
-<span class="font-headline-md text-primary block">Fecha</span>
-<h3 class="font-headline-lg text-on-primary-container leading-tight">Titulo</h3>
-<p class="font-body-md text-on-surface-variant">Descripción</p>
-</div>
-<div class="absolute top-2 right-2">
-<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">stars</span>
-</div>
-</div>
-</div>
-<div class="hidden md:block w-4 h-4 rounded-full bg-primary mt-8 shadow-lg shadow-primary/50"></div>
-<div class="w-1/2 hidden md:block"></div>
-</div>
-</div>
-</div>
-    </main>
-</div>
+        <!-- CAPAS DE LA FLOR DE LYCORIS -->
+        <g>
+          <path class="petal-path layer-back" d="M146,178 Q110,140 80,130 C95,115 120,130 146,178 Z" />
+          <path class="petal-path layer-back" d="M146,178 Q120,120 100,90 C120,95 135,120 146,178 Z" />
+          <path class="petal-path layer-back" d="M154,178 Q190,140 220,130 C205,115 180,130 154,178 Z" />
+          <path class="petal-path layer-back" d="M154,178 Q180,120 200,90 C180,95 165,120 154,178 Z" />
+          <path class="petal-path layer-back" d="M150,178 Q150,110 150,70 C160,95 158,130 150,178 Z" />
+        </g>
 
-<!-- PAGE: DIARIO -->
-<div id="page-diario" class="spa-page">
-    <main class="relative z-20 paper-texture px-4 md:px-margin-desktop pb-24">
+        <g>
+          <path class="petal-path layer-mid-back" d="M146,178 Q90,160 60,165 C75,145 110,150 146,178 Z" />
+          <path class="petal-path layer-mid-back" d="M154,178 Q210,160 240,165 C225,145 190,150 154,178 Z" />
+          <path class="petal-path layer-mid-back" d="M148,178 Q130,110 120,80 C138,90 142,120 148,178 Z" />
+          <path class="petal-path layer-mid-back" d="M152,178 Q170,110 180,80 C162,90 158,120 152,178 Z" />
+        </g>
 
-<!-- Title Section -->
-<div class="py-12 text-center">
-    <h1 class="font-display-lg text-primary mb-2">Mi Diario</h1>
-    <p class="font-body-lg text-on-surface-variant">Guarda tus pensamientos y momentos especiales</p>
-</div>
+        <g>
+          <path class="petal-path layer-mid-front" d="M146,178 C110,170 80,190 55,200 C75,175 115,170 146,178 Z" />
+          <path class="petal-path layer-mid-front" d="M154,178 C190,170 220,190 245,200 C225,175 185,170 154,178 Z" />
+          <path class="petal-path layer-mid-front" d="M147,178 C130,140 100,120 75,100 C100,115 125,140 147,178 Z" />
+          <path class="petal-path layer-mid-front" d="M153,178 C170,140 200,120 225,100 C200,115 175,140 153,178 Z" />
+        </g>
 
-<!-- localStorage warning banner -->
-<div id="diary-storage-warning" class="hidden max-w-4xl mx-auto mb-4">
-    <div class="flex items-center gap-3 bg-error-container text-on-error-container rounded-xl px-6 py-4 font-label-md">
-        <span class="material-symbols-outlined">warning</span>
-        Tu navegador tiene el almacenamiento local bloqueado. Las entradas no se guardarán entre sesiones.
-    </div>
-</div>
+        <g>
+          <path class="petal-path layer-front" d="M148,178 Q125,185 100,215 Q125,195 148,178 Z" />
+          <path class="petal-path layer-front" d="M152,178 Q175,185 200,215 Q175,195 152,178 Z" />
+          <path class="petal-path layer-front" d="M150,178 Q140,140 135,115 Q148,140 150,178 Z" />
+          <path class="petal-path layer-front" d="M150,178 Q160,140 165,115 Q152,140 150,178 Z" />
+        </g>
 
-<!-- Draft restore banner -->
-<div id="diary-draft-banner" class="hidden max-w-4xl mx-auto mb-4">
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-6 py-4">
-        <div class="flex items-center gap-2 font-label-md">
-            <span class="material-symbols-outlined text-primary">history</span>
-            Tenés un borrador sin guardar de tu última sesión.
-        </div>
-        <div class="flex gap-2">
-            <button id="draft-restore-btn" class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-md hover:bg-tertiary transition-all">Recuperar</button>
-            <button id="draft-discard-btn" class="bg-surface-container text-on-surface-variant px-4 py-2 rounded-full font-label-md hover:bg-surface-container-high transition-all">Descartar</button>
-        </div>
-    </div>
-</div>
+        <g>
+          <path class="stamen-path" d="M146,178 C100,150 50,120 25,75" />
+          <circle class="anther" cx="25" cy="75" r="2.5" />
 
-<!-- Journal Workspace -->
-<div class="max-w-4xl mx-auto mb-24" id="diary-card" style="transform: none;">
-    <div class="relative bg-white rounded-xl shadow-xl overflow-hidden border border-outline-variant/30 paper-texture">
-        <div class="washi-tape absolute top-4 -left-4 w-32 h-8 bg-primary-container/40 z-30"></div>
-        <div class="washi-tape absolute -top-2 -right-6 w-24 h-10 bg-tertiary-fixed/30 z-30 rotate-12"></div>
-        <div class="p-8 md:p-12">
-            <!-- Date + Title -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b-2 border-dashed border-primary-fixed pb-6">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary text-4xl">calendar_today</span>
-                    <div>
-                        <p class="font-label-sm text-primary uppercase tracking-widest">DÍA</p>
-                        <h2 class="font-headline-md text-on-surface" id="diary-date-display"></h2>
-                    </div>
-                </div>
-                <div class="w-full md:w-auto flex items-center gap-2">
-                    <input id="diary-title-input"
-                        class="w-full md:w-64 bg-transparent border-none focus:ring-0 font-headline-md text-on-primary-container placeholder:text-outline/50 border-b border-outline-variant"
-                        placeholder="Título de mi día..." type="text">
-                    <span id="autosave-indicator" class="hidden text-outline font-label-sm whitespace-nowrap flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">cloud_done</span> Borrador guardado
-                    </span>
-                </div>
-            </div>
-            <!-- Writing Area -->
-            <div class="relative min-h-[400px]">
-                <textarea id="diary-body-input"
-                    class="w-full h-full min-h-[400px] bg-transparent border-none focus:ring-0 font-body-lg text-on-surface notebook-lines resize-none p-0"
-                    placeholder="Querido diario..."></textarea>
-            </div>
-            <!-- Actions -->
-            <div class="mt-12 flex flex-wrap justify-center gap-4">
-                <button id="diary-save-btn" type="button"
-                    class="group relative flex items-center gap-3 bg-primary text-on-primary px-8 py-4 rounded-full font-headline-md shadow-lg hover:bg-tertiary hover:scale-105 transition-all duration-300">
-                    <span class="material-symbols-outlined group-hover:animate-bounce">auto_awesome</span>
-                    Guardar Recuerdo
-                </button>
-                <button id="diary-new-btn" type="button"
-                    class="flex items-center gap-2 bg-surface-container text-on-surface-variant px-6 py-4 rounded-full font-headline-md shadow hover:bg-secondary-container hover:scale-105 transition-all duration-300">
-                    <span class="material-symbols-outlined">add_circle</span>
-                    Nueva entrada
-                </button>
-            </div>
-            <!-- Save feedback toast -->
-            <div id="diary-toast"
-                class="hidden mt-6 mx-auto max-w-xs text-center bg-tertiary-container text-on-tertiary-container font-label-md px-6 py-3 rounded-full shadow transition-all">
-                ✨ ¡Recuerdo guardado!
-            </div>
-        </div>
-    </div>
-</div>
+          <path class="stamen-path" d="M146,178 C90,130 45,80 35,35" />
+          <circle class="anther" cx="35" cy="35" r="2.5" />
 
-<!-- Export / Import bar -->
-<div class="max-w-6xl mx-auto mb-12">
-    <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-container-low rounded-xl px-6 py-4 border border-outline-variant/30">
-        <p class="font-label-md text-on-surface-variant flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">sync</span>
-            Exportar o importar tus memorias para usarlas en otro dispositivo
-        </p>
-        <div class="flex flex-wrap gap-3">
-            <button id="diary-export-btn"
-                class="flex items-center gap-2 bg-primary text-on-primary px-5 py-2 rounded-full font-label-md hover:bg-tertiary hover:scale-105 transition-all">
-                <span class="material-symbols-outlined text-[18px]">download</span>
-                Exportar (.json)
-            </button>
-            <label class="flex items-center gap-2 bg-secondary-container text-on-secondary-container px-5 py-2 rounded-full font-label-md hover:scale-105 transition-all cursor-pointer">
-                <span class="material-symbols-outlined text-[18px]">upload</span>
-                Importar (.json)
-                <input id="diary-import-input" type="file" accept=".json" class="hidden">
-            </label>
-        </div>
-    </div>
-</div>
+          <path class="stamen-path" d="M148,178 C110,110 80,50 75,15" />
+          <circle class="anther" cx="75" cy="15" r="2.5" />
 
-<!-- Past Memories Section -->
-<section class="max-w-6xl mx-auto">
-    <div class="flex items-center gap-4 mb-10">
-        <h2 class="font-display-lg text-headline-lg text-primary">Mis Memorias</h2>
-        <div class="h-px flex-grow bg-gradient-to-r from-primary-fixed to-transparent"></div>
-        <span id="diary-count" class="font-label-sm text-outline italic"></span>
-    </div>
-    <!-- Empty state -->
-    <div id="diary-empty" class="hidden text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-primary-fixed-dim" style="font-variation-settings:'FILL' 1;">auto_stories</span>
-        <p class="font-body-lg text-on-surface-variant mt-4">Todavía no hay memorias guardadas.<br>¡Escribe tu primera entrada!</p>
-    </div>
-    <!-- Entries grid -->
-    <div id="diary-entries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"></div>
-</section>
+          <path class="stamen-path" d="M150,178 C135,100 130,40 125,5" />
+          <circle class="anther" cx="125" cy="5" r="2.5" />
 
-<!-- Modal: read full entry -->
-<div id="diary-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="absolute inset-0 bg-on-surface/30 backdrop-blur-sm" id="diary-modal-backdrop"></div>
-    <div class="relative bg-white rounded-xl shadow-2xl max-w-xl w-full max-h-[80vh] overflow-y-auto paper-texture border border-outline-variant/30 p-8 md:p-10 z-10">
-        <div class="washi-tape absolute top-4 -left-4 w-28 h-7 bg-primary-container/50 z-20"></div>
-        <button id="diary-modal-close" class="absolute top-4 right-4 text-outline hover:text-tertiary transition-colors">
-            <span class="material-symbols-outlined">close</span>
-        </button>
-        <p class="font-label-sm text-tertiary uppercase tracking-widest mb-1" id="modal-date"></p>
-        <h3 class="font-headline-lg text-on-primary-container mb-6 leading-snug" id="modal-title"></h3>
-        <p class="font-body-lg text-on-surface whitespace-pre-wrap leading-relaxed" id="modal-body"></p>
-        <div class="mt-8 flex justify-end gap-3">
-            <button id="modal-edit-btn"
-                class="flex items-center gap-2 bg-surface-container text-on-surface-variant px-5 py-2 rounded-full font-label-md hover:bg-secondary-container transition-all">
-                <span class="material-symbols-outlined text-[18px]">edit</span> Editar
-            </button>
-            <button id="modal-delete-btn"
-                class="flex items-center gap-2 bg-error-container text-on-error-container px-5 py-2 rounded-full font-label-md hover:scale-105 transition-all">
-                <span class="material-symbols-outlined text-[18px]">delete</span> Eliminar
-            </button>
-        </div>
-    </div>
-</div>
+          <path class="stamen-path" d="M150,178 C165,100 170,40 175,5" />
+          <circle class="anther" cx="175" cy="5" r="2.5" />
 
-    </main>
-</div>
+          <path class="stamen-path" d="M152,178 C190,110 220,50 225,15" />
+          <circle class="anther" cx="225" cy="15" r="2.5" />
 
-<!-- LIGHTBOX GALERÍA -->
-<div id="gallery-lightbox" class="fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="absolute inset-0 bg-on-surface/70 backdrop-blur-sm" id="gallery-lightbox-backdrop"></div>
-    <div class="relative z-10 max-w-5xl max-h-[90vh] w-full flex flex-col items-center">
-        <button id="gallery-lightbox-close" class="absolute -top-12 right-0 text-white hover:text-primary-container transition-colors">
-            <span class="material-symbols-outlined text-4xl">close</span>
-        </button>
-        <img id="gallery-lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border-4 border-white" src="" alt="Vista completa">
-    </div>
-</div>
+          <path class="stamen-path" d="M154,178 C210,130 255,80 265,35" />
+          <circle class="anther" cx="265" cy="35" r="2.5" />
 
-<!-- FOOTER (shared) -->
-<footer class="bg-secondary-container rounded-t-xl border-t-2 border-dashed border-outline-variant relative z-20">
-    <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-12 gap-gutter max-w-7xl mx-auto">
-        <div class="flex flex-col gap-4">
-            <div class="font-headline-md text-primary">Rincón de Haru</div>
-            <p class="font-body-md text-on-secondary-container">Hecho con amor y cariño</p>
-        </div>
-        <div class="flex gap-8 items-center"></div>
-    </div>
-</footer>
+          <path class="stamen-path" d="M154,178 C200,150 250,120 275,75" />
+          <circle class="anther" cx="275" cy="75" r="2.5" />
+        </g>
 
-<!-- WIDGET FLOTANTE: SPOTIFY -->
-<div id="music-widget">
-
-    <!-- Panel Spotify -->
-    <div id="mw-spotify-panel" class="music-panel w-[340px] relative">
-        <button id="mw-close-spotify" type="button" class="absolute -top-3 -right-3 z-20 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-outline hover:text-tertiary transition-colors border border-outline-variant/20">
-            <span class="material-symbols-outlined text-[18px]">close</span>
-        </button>
-        <iframe src="https://open.spotify.com/embed/playlist/55hcjfEUbTenPmeilK8F0k"
-                width="100%"
-                height="352"
-                frameborder="0"
-                allowfullscreen=""
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                class="rounded-xl shadow-xl"></iframe>
+      </svg>
     </div>
 
-    <!-- Caja musical trigger -->
-    <div id="music-box-btn" title="Mi música">
-        <div class="relative">
-            <div class="absolute -top-3 -left-3 washi-tape px-2 py-0.5 text-on-primary-container text-[10px] font-label-sm z-20 rounded-sm whitespace-nowrap" id="mw-washi-label">
-                Mi música ♪
-            </div>
-            
-            <!-- REEMPLAZO SEGURO ANTI-CAÍDAS: Botón pastel diseñado con Tailwind y Material Icons -->
-            <!-- (Si en el futuro tienes un archivo propio de imagen, borra este div y usa: <img src="./images/tu-caja.png" class="w-16 h-16 object-contain">) -->
-            <div class="w-16 h-16 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center shadow-md border-2 border-white transition-transform">
-                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">library_music</span>
-            </div>
+    <p class="instruction" id="instruction">Toca la pantalla para que el lycoris florezca</p>
 
-            <div class="absolute -bottom-1 -right-1 pointer-events-none">
-                <span class="material-symbols-outlined text-tertiary text-lg" style="font-variation-settings:'FILL' 1;">favorite</span>
-            </div>
-        </div>
+    <div class="letter-card" id="card">
+      <h2>Feliz día</h2>
+      <p>Llego tarde con el mensaje, alrededor de un día de retraso, pero no quería dejar pasar la fecha sin haberte
+        dado algo, estos días vos estuviste haciendo un esfuerzo enorme, estuviste haciendo unos detalles tan bonitos
+        que me inspiras a querer darte todo. Ya pasó un mes desde que nos conocemos y parecía que habían sido más,
+        muchos más, la conexión que tengo con vos hace que la noción del tiempo se altere y este mes se sienta como si
+        hubieran pasado años o incluso vidas. Mi tiempo con vos es tan valioso y quiero que este mes se convierta en un
+        futuro en lo que la misma noción del tiempo alterada trata de comunicar, toda una vida con vos y incluso más que
+        eso, sos mi mundo entero, sos mi vida completa, sos el amor de mi vida y más, Saskya Luzzy, te amo con mi alma y
+        feliz primer mes mi bebé hermosa</p>
     </div>
+  </div>
 
-</div>
+  <script>
+    // Generar estrellas dinámicamente con JS
+    const starfield = document.getElementById('starfield');
+    const starCount = 45; // Cantidad de estrellas en la lluvia
 
-<script>
-// ─── SPA Router ───────────────────────────────────
-function navigateTo(page) {
-    document.querySelectorAll('.spa-page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById('page-' + page);
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.toggle('active-page', link.dataset.page === page);
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    history.pushState(null, '', '#' + page);
-    if (page === 'diario') initDiaryScript();
-    if (page === 'home') initStickyNotes();
-}
+    for (let i = 0; i < starCount; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
 
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        navigateTo(link.dataset.page);
-    });
-});
+      const size = Math.random() * 3 + 1; // Tamaño de 1 a 4px
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
 
-window.addEventListener('popstate', () => {
-    const page = location.hash.replace('#','') || 'home';
-    navigateTo(page);
-});
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * -20}%`; // Empiezan arriba
 
-const initialPage = location.hash.replace('#','') || 'home';
-navigateTo(initialPage);
+      const duration = Math.random() * 4 + 3; // Velocidad entre 3 y 7s
+      const delay = Math.random() * 5;
 
-// ─── Background: Clouds ───────────────────────────
-const cloudContainer = document.getElementById('cloud-container');
-for (let i = 0; i < 10; i++) {
-    const cloud = document.createElement('div');
-    cloud.className = 'cloud';
-    const size = Math.random() * 300 + 150;
-    cloud.style.width = size + 'px';
-    cloud.style.height = (size * 0.5) + 'px';
-    cloud.style.top = (Math.random() * 85) + 'vh';
-    cloud.style.left = (Math.random() * -400) + 'px';
-    cloud.style.setProperty('--duration', (Math.random() * 60 + 40) + 's');
-    cloud.style.animationDelay = (Math.random() * -100) + 's';
-    cloudContainer.appendChild(cloud);
-}
+      star.style.animationDuration = `${duration}s`;
+      star.style.animationDelay = `${delay}s`;
 
-// ─── Background: Particles ────────────────────────
-const particleContainer = document.getElementById('particle-container');
-function createParticle() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 12 + 4;
-    const colors = ['#ffffff', '#ffc1cc', '#ffd9df', '#f3b7c1'];
-    p.style.width = size + 'px';
-    p.style.height = size + 'px';
-    p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    p.style.left = (Math.random() * 100) + 'vw';
-    p.style.setProperty('--p-duration', (Math.random() * 8 + 6) + 's');
-    p.style.filter = 'blur(2px)';
-    particleContainer.appendChild(p);
-    setTimeout(() => p.remove(), 14000);
-}
-for (let i = 0; i < 12; i++) setTimeout(createParticle, Math.random() * 5000);
-setInterval(createParticle, 900);
-
-// ─── Diary: localStorage engine ───────────────────
-const DIARY_KEY       = 'rincon_haru_diary';
-const DIARY_DRAFT_KEY = 'rincon_haru_draft';
-const CARD_ROTATIONS  = ['-rotate-2', 'rotate-2', '-rotate-1', 'rotate-3', '-rotate-3', 'rotate-1'];
-const CARD_ICONS      = [
-    { icon: 'stars',        color: 'text-primary',           bg: 'bg-secondary-container/60', tape: 'left-1/2 -translate-x-1/2' },
-    { icon: 'favorite',     color: 'text-secondary',         bg: 'bg-primary-container/60',   tape: 'right-4 rotate-6' },
-    { icon: 'auto_awesome', color: 'text-primary-fixed-dim', bg: 'bg-tertiary-fixed/60',      tape: 'left-4 -rotate-12' },
-    { icon: 'spa',          color: 'text-tertiary',          bg: 'bg-secondary-container/60', tape: 'left-1/3' },
-];
-
-let editingId        = null;
-let autosaveTimer    = null;
-let storageAvailable = false;
-
-function checkStorage() {
-    try {
-        localStorage.setItem('__test__', '1');
-        localStorage.removeItem('__test__');
-        storageAvailable = true;
-    } catch {
-        storageAvailable = false;
-        document.getElementById('diary-storage-warning').classList.remove('hidden');
-    }
-}
-
-function diaryLoad() {
-    if (!storageAvailable) return [];
-    try { return JSON.parse(localStorage.getItem(DIARY_KEY)) || []; }
-    catch { return []; }
-}
-
-function diarySave(entries) {
-    if (!storageAvailable) return;
-    localStorage.setItem(DIARY_KEY, JSON.stringify(entries));
-}
-
-function draftSave() {
-    if (!storageAvailable) return;
-    const title = document.getElementById('diary-title-input').value;
-    const body  = document.getElementById('diary-body-input').value;
-    if (!title && !body) { draftClear(); return; }
-    localStorage.setItem(DIARY_DRAFT_KEY, JSON.stringify({ title, body, editingId, ts: Date.now() }));
-    const ind = document.getElementById('autosave-indicator');
-    ind.classList.remove('hidden');
-    clearTimeout(autosaveTimer);
-    autosaveTimer = setTimeout(() => ind.classList.add('hidden'), 2000);
-}
-
-function draftLoad() {
-    if (!storageAvailable) return null;
-    try { return JSON.parse(localStorage.getItem(DIARY_DRAFT_KEY)); }
-    catch { return null; }
-}
-
-function draftClear() {
-    if (!storageAvailable) return;
-    localStorage.removeItem(DIARY_DRAFT_KEY);
-    document.getElementById('diary-draft-banner').classList.add('hidden');
-}
-
-function formatDate(iso) {
-    const d = new Date(iso);
-    return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-}
-
-function showToast(msg = 'Recuerdo guardado') {
-    const t = document.getElementById('diary-toast');
-    t.textContent = msg;
-    t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 2500);
-}
-
-function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function renderEntries() {
-    const entries = diaryLoad();
-    const grid    = document.getElementById('diary-entries-grid');
-    const empty   = document.getElementById('diary-empty');
-    const count   = document.getElementById('diary-count');
-
-    grid.innerHTML = '';
-    count.textContent = entries.length ? `${entries.length} entrada${entries.length !== 1 ? 's' : ''}` : '';
-
-    if (!entries.length) { empty.classList.remove('hidden'); return; }
-    empty.classList.add('hidden');
-
-    [...entries].reverse().forEach((entry, i) => {
-        const rot   = CARD_ROTATIONS[i % CARD_ROTATIONS.length];
-        const style = CARD_ICONS[i % CARD_ICONS.length];
-        const card  = document.createElement('div');
-        card.className = `relative polaroid-frame group cursor-pointer hover:-translate-y-2 transition-all ${rot}`;
-        card.dataset.id = entry.id;
-        card.innerHTML = `
-            <div class="washi-tape absolute -top-3 ${style.tape} w-16 h-6 ${style.bg} z-20"></div>
-            <div class="bg-surface-container-low p-4 rounded-sm mb-4">
-                <p class="font-label-sm text-tertiary mb-1">${formatDate(entry.date)}</p>
-                <h3 class="font-headline-md text-on-primary-container mb-2 line-clamp-1">${escHtml(entry.title || 'Sin título')}</h3>
-                <p class="font-body-md text-on-surface-variant line-clamp-3">${escHtml(entry.body || '')}</p>
-            </div>
-            <div class="flex justify-between items-center px-2">
-                <span class="material-symbols-outlined ${style.color}" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
-                <span class="text-outline text-label-sm italic">Leer más</span>
-            </div>`;
-        card.addEventListener('click', () => openModal(entry.id));
-        grid.appendChild(card);
-    });
-}
-
-function openModal(id) {
-    const entry = diaryLoad().find(e => e.id === id);
-    if (!entry) return;
-    document.getElementById('modal-date').textContent  = formatDate(entry.date);
-    document.getElementById('modal-title').textContent = entry.title || 'Sin título';
-    document.getElementById('modal-body').textContent  = entry.body || '';
-    document.getElementById('modal-edit-btn').onclick = function(e) { e.preventDefault(); closeModal(); loadEntryIntoEditor(id); };
-    document.getElementById('modal-delete-btn').onclick = function(e) { e.preventDefault(); deleteEntry(id); };
-    document.getElementById('diary-modal').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('diary-modal').classList.add('hidden');
-}
-
-function loadEntryIntoEditor(id) {
-    const entry = diaryLoad().find(e => e.id === id);
-    if (!entry) return;
-    document.getElementById('diary-title-input').value = entry.title;
-    document.getElementById('diary-body-input').value  = entry.body;
-    editingId = id;
-    document.getElementById('diary-save-btn').innerHTML =
-        '<span class="material-symbols-outlined group-hover:animate-bounce">save</span> Actualizar Recuerdo';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function deleteEntry(id) {
-    if (!confirm('¿Eliminar esta entrada? No se puede deshacer.')) return;
-    const entries = diaryLoad().filter(e => e.id !== id);
-    diarySave(entries);
-    closeModal();
-    renderEntries();
-}
-
-function clearEditor() {
-    document.getElementById('diary-title-input').value = '';
-    document.getElementById('diary-body-input').value  = '';
-    editingId = null;
-    draftClear();
-    document.getElementById('diary-save-btn').innerHTML =
-        '<span class="material-symbols-outlined group-hover:animate-bounce">auto_awesome</span> Guardar Recuerdo';
-}
-
-let diaryInitialized = false;
-function initDiaryScript() {
-    if (diaryInitialized) {
-        checkStorage();
-        renderEntries();
-        document.getElementById('diary-date-display').textContent =
-            new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-        return;
-    }
-    diaryInitialized = true;
-    checkStorage();
-
-    document.getElementById('diary-date-display').textContent =
-        new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-
-    renderEntries();
-
-    const draft = draftLoad();
-    if (draft && (draft.title || draft.body)) {
-        const banner = document.getElementById('diary-draft-banner');
-        banner.classList.remove('hidden');
-
-        document.getElementById('draft-restore-btn').onclick = function(e) {
-            e.preventDefault();
-            document.getElementById('diary-title-input').value = draft.title || '';
-            document.getElementById('diary-body-input').value  = draft.body  || '';
-            editingId = draft.editingId || null;
-            if (editingId) {
-                document.getElementById('diary-save-btn').innerHTML =
-                    '<span class="material-symbols-outlined group-hover:animate-bounce">save</span> Actualizar Recuerdo';
-            }
-            banner.classList.add('hidden');
-            showToast('Borrador recuperado');
-        };
-
-        document.getElementById('draft-discard-btn').onclick = function(e) {
-            e.preventDefault();
-            draftClear();
-            banner.classList.add('hidden');
-        };
+      starfield.appendChild(star);
     }
 
-    let debounce;
-    const autoSaveTrigger = () => {
-        clearTimeout(debounce);
-        debounce = setTimeout(draftSave, 1500);
-    };
-    document.getElementById('diary-title-input').addEventListener('input', autoSaveTrigger);
-    document.getElementById('diary-body-input').addEventListener('input', autoSaveTrigger);
+    // Interacción de la flor
+    const flower = document.getElementById('flower');
+    const card = document.getElementById('card');
+    const instruction = document.getElementById('instruction');
 
-    const saveBtn = document.getElementById('diary-save-btn');
-    saveBtn.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const title = document.getElementById('diary-title-input').value.trim();
-        const body  = document.getElementById('diary-body-input').value.trim();
-        if (!title && !body) { showToast('Escribe algo primero...'); return; }
-
-        const entries = diaryLoad();
-        if (editingId) {
-            const idx = entries.findIndex(e => e.id === editingId);
-            if (idx !== -1) { entries[idx].title = title; entries[idx].body = body; }
-        } else {
-            entries.push({ id: Date.now().toString(), date: new Date().toISOString(), title, body });
-        }
-        diarySave(entries);
-        draftClear();
-        clearEditor();
-        renderEntries();
-        showToast(editingId ? 'Entrada actualizada!' : 'Recuerdo guardado!');
-    };
-
-    const newBtn = document.getElementById('diary-new-btn');
-    newBtn.onclick = function(e) {
-        e.preventDefault();
-        clearEditor();
-    };
-
-    document.getElementById('diary-modal-close').onclick = function(e) { e.preventDefault(); closeModal(); };
-    document.getElementById('diary-modal-backdrop').onclick = function(e) { e.preventDefault(); closeModal(); };
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-    document.getElementById('diary-export-btn').onclick = function(e) {
-        e.preventDefault();
-        const data = localStorage.getItem(DIARY_KEY) || '[]';
-        const blob = new Blob([data], { type: 'application/json' });
-        const a    = document.createElement('a');
-        a.href     = URL.createObjectURL(blob);
-        a.download = `rincon-haru-diario-${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-    };
-
-    document.getElementById('diary-import-input').onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const incoming = JSON.parse(ev.target.result);
-                if (!Array.isArray(incoming)) throw new Error();
-                const existing    = diaryLoad();
-                const existingIds = new Set(existing.map(e => e.id));
-                const merged      = [...existing, ...incoming.filter(e => !existingIds.has(e.id))];
-                merged.sort((a, b) => new Date(a.date) - new Date(b.date));
-                diarySave(merged);
-                renderEntries();
-                showToast(`${incoming.length} entrada(s) importada(s)!`);
-            } catch {
-                showToast('Archivo inválido.');
-            }
-            e.target.value = '';
-        };
-        reader.readAsText(file);
-    };
-
-    const journalCard = document.getElementById('diary-card');
-    if (!journalCard) return;
-    journalCard.addEventListener('mousemove', (e) => {
-        const { left, top, width, height } = journalCard.getBoundingClientRect();
-        const x = (e.clientX - left) / width - 0.5;
-        const y = (e.clientY - top) / height - 0.5;
-        journalCard.style.transform = `perspective(1000px) rotateY(${x * 2}deg) rotateX(${-y * 2}deg)`;
+    flower.addEventListener('click', () => {
+      flower.classList.add('bloomed');
+      instruction.style.opacity = '0';
+      card.classList.add('show');
     });
-    journalCard.addEventListener('mouseleave', () => {
-        journalCard.style.transform = 'none';
-    });
-}
-
-// ─── Home: sticky notes click ───
-function initStickyNotes() {
-    document.querySelectorAll('#page-home .w-64.shadow-md').forEach(note => {
-        note.addEventListener('click', function(e) {
-            note.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            note.style.transform = 'scale(1.1) rotate(0deg) translateY(-20px)';
-            setTimeout(() => { note.style.transform = ''; }, 1000);
-        });
-    });
-}
-
-// ─── Widget flotante: Spotify ───────────────────
-const mwBoxBtn       = document.getElementById('music-box-btn');
-const mwSpotifyPanel = document.getElementById('mw-spotify-panel');
-const mwCloseSpotify = document.getElementById('mw-close-spotify');
-
-function mwShow(panel) {
-    panel.classList.add('visible');
-    panel.classList.add('settled');
-}
-function mwHide(panel) {
-    panel.classList.remove('visible');
-    panel.classList.remove('settled');
-}
-
-mwBoxBtn.addEventListener('click', function(e) {
-    if (mwSpotifyPanel.classList.contains('visible')) {
-        mwHide(mwSpotifyPanel);
-    } else {
-        mwShow(mwSpotifyPanel);
-    }
-});
-
-mwCloseSpotify.addEventListener('click', function(e) {
-    e.stopPropagation();
-    mwHide(mwSpotifyPanel);
-});
-
-// ─── Gallery Lightbox ───
-(function() {
-    const lightbox = document.getElementById('gallery-lightbox');
-    const lbImg    = document.getElementById('gallery-lightbox-img');
-    const lbClose  = document.getElementById('gallery-lightbox-close');
-    const lbBack   = document.getElementById('gallery-lightbox-backdrop');
-    if (!lightbox) return;
-
-    document.querySelectorAll('.gallery-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-            const img = item.querySelector('img');
-            if (img && img.src) {
-                lbImg.src = img.src;
-                lightbox.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-        });
-    });
-
-    // Cambiar cursor a puntero en la galería
-    function closeLb() {
-        lightbox.classList.add('hidden');
-        lbImg.src = '';
-        document.body.style.overflow = '';
-    }
-
-    lbClose.addEventListener('click', closeLb);
-    lbBack.addEventListener('click', closeLb);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLb(); });
-
-    let lbTouchStartY = 0;
-    lightbox.addEventListener('touchstart', e => { lbTouchStartY = e.touches[0].clientY; }, { passive: true });
-    lightbox.addEventListener('touchend', e => {
-        const dy = e.changedTouches[0].clientY - lbTouchStartY;
-        if (dy > 60) closeLb();
-    }, { passive: true });
-})();
-</script>
+  </script>
 </body>
+
 </html>
