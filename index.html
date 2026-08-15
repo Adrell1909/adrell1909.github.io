@@ -4,88 +4,696 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Una sorpresa para ti</title>
+  <title>Un Rincón Especial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <style>
+    :root {
+      --ink-black: #050308;
+      --deep-wine: #1a0509;
+      --crimson: #e62335;
+      --crimson-bright: #ff3c50;
+      --crimson-deep: #730612;
+      --gold: #f0c674;
+      --text-main: #f3ecee;
+      --text-muted: #cbb7bd;
+      --glass: rgba(15, 8, 12, 0.55);
+      --glass-border: rgba(230, 35, 53, 0.28);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
-      /* Fondo con imagen de galaxia/nebulosa + degradado superpuesto para no perder contraste */
-      background: linear-gradient(rgba(6, 6, 8, 0.75), rgba(6, 6, 8, 0.75)),
-        url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=1600&auto=format&fit=crop') no-repeat center center fixed;
-      background-size: cover;
-      color: #ffffff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
-      position: relative;
+    html {
+      scroll-behavior: smooth;
     }
 
-    /* --- CAPA DE LLUVIA DE ESTRELLA FUGAZ / PARTÍCULAS --- */
+    body {
+      color: var(--text-main);
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 2s ease;
+      background-color: var(--ink-black);
+      animation: pageIn 1.2s ease;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    ::selection {
+      background: var(--crimson);
+      color: #fff;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+    }
+
+    /* --- FONDOS DE ESCENARIOS --- */
+    .bg-stars {
+      background: radial-gradient(ellipse at 50% 100%, #0d1522 0%, #050308 65%, #020103 100%);
+    }
+
+    .bg-eclipse {
+      background: radial-gradient(circle at 50% 38%, #170a12 0%, #08030a 55%, #020102 100%);
+    }
+
+    .bg-aurora {
+      background: linear-gradient(180deg, #020913 0%, #041420 45%, #020a12 75%, #010306 100%);
+    }
+
+    .bg-moon {
+      background: radial-gradient(circle at 50% 32%, #0e1420 0%, #060810 55%, #020203 100%);
+    }
+
+    .bg-sun {
+      background: linear-gradient(180deg, #1c0f3d 0%, #59204f 30%, #a5354a 55%, #d97a4e 78%, #4a1c2e 100%);
+    }
+
+    .bg-nebula {
+      background: radial-gradient(circle at 58% 38%, #35102e 0%, #170620 50%, #06010a 100%);
+    }
+
+    .world-element {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    .world-element.active {
+      opacity: 1;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.55) 100%);
+    }
+
+    /* ================= PROFUNDIDAD / PARALLAX ================= */
+    .parallax-layer {
+      position: absolute;
+      inset: 0;
+      will-change: transform;
+      transition: transform .15s ease-out;
+    }
+
+    .parallax-hint {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      color: #e9dfe1;
+      font-family: 'Poppins', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .5px;
+      background: rgba(10, 6, 9, .5);
+      border: 1px solid rgba(255, 255, 255, .12);
+      backdrop-filter: blur(10px);
+      padding: 9px 16px;
+      border-radius: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .6s ease;
+      white-space: nowrap;
+    }
+
+    .parallax-hint.show {
+      opacity: .9;
+    }
+
+    @media (max-width:600px) {
+      .parallax-hint {
+        font-size: .68rem;
+        padding: 8px 12px;
+        bottom: 100px;
+      }
+    }
+
+    /* Siluetas de horizonte para anclar la escena (dan sensación de "estar ahí") */
+    .foreground-silhouette {
+      position: absolute;
+      top: auto;
+      bottom: 0;
+      left: -5%;
+      right: auto;
+      width: 110%;
+      height: 20%;
+      z-index: 1;
+    }
+
+    .mountains {
+      fill: #050308;
+      opacity: .92;
+    }
+
+    .mountains-far {
+      fill: #0a0710;
+      opacity: .65;
+    }
+
+    /* Montañas del Atardecer: tres capas de profundidad, más grandes y con paleta cálida */
+    .fs-far {
+      height: 40%;
+      z-index: 1;
+    }
+
+    .fs-mid {
+      height: 30%;
+      z-index: 1;
+    }
+
+    .fs-near {
+      height: 22%;
+      z-index: 2;
+    }
+
+    .sun-mountains-far {
+      fill: #3a2350;
+      opacity: .5;
+    }
+
+    .sun-mountains-mid {
+      fill: #241333;
+      opacity: .78;
+    }
+
+    .sun-mountains-near {
+      fill: #160a1c;
+      opacity: .98;
+    }
+
+    .sun-mountains-ridge-glow {
+      fill: none;
+      stroke: url(#ridgeGlow);
+      stroke-width: 1.4;
+      vector-effect: non-scaling-stroke;
+    }
+
+    /* ================= CONTROL DE ESCENA (sliders interactivos) ================= */
+    .scene-control {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 11;
+      width: min(88vw, 380px);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 14px 20px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .5s ease;
+    }
+
+    .scene-control.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .scene-control .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Poppins', sans-serif;
+      font-size: .72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 9px;
+    }
+
+    .scene-control input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--crimson-deep), var(--crimson-bright), var(--gold));
+      outline: none;
+      cursor: pointer;
+    }
+
+    .scene-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, .8), 0 0 20px rgba(230, 35, 53, .6);
+      cursor: pointer;
+      border: 2px solid var(--crimson-bright);
+    }
+
+    .scene-control input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, .8), 0 0 20px rgba(230, 35, 53, .6);
+      cursor: pointer;
+      border: 2px solid var(--crimson-bright);
+      border-radius: 50%;
+    }
+
+    .scene-control .control-hint {
+      margin-top: 8px;
+      font-size: .68rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: .3px;
+    }
+
+    /* ================= ESTRELLAS ================= */
     .starfield {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       pointer-events: none;
       z-index: 0;
     }
 
-    .star {
+    #starsCanvas {
       position: absolute;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.8;
-      animation: fall linear infinite;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
     }
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-10px) translateX(0);
-        opacity: 0;
+    .twinkle {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: .25;
+        transform: scale(0.8);
       }
 
-      20% {
-        opacity: 0.9;
+      50% {
+        opacity: 1;
+        transform: scale(1.15);
+      }
+    }
+
+    /* ================= ECLIPSE (canvas realista) ================= */
+    #eclipseCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ================= AURORA ================= */
+    .aurora-sky-stars {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(1px 1px at 20% 15%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 60% 10%, #fff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 80% 20%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 35% 8%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 90% 12%, #fff 100%, transparent);
+      opacity: .6;
+    }
+
+    #auroraCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .aurora-horizon {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 22%;
+      background: linear-gradient(180deg, rgba(2, 5, 10, 0) 0%, rgba(2, 6, 12, 0.9) 80%);
+    }
+
+    .aurora-mountains-far {
+      fill: #0d2b3a;
+      opacity: .55;
+    }
+
+    .aurora-mountains-mid {
+      fill: #081a26;
+      opacity: .82;
+    }
+
+    .aurora-mountains-near {
+      fill: #050d14;
+      opacity: .98;
+    }
+
+    .aurora-mountains-ridge-glow {
+      fill: none;
+      stroke: url(#auroraRidgeGlow);
+      stroke-width: 1.4;
+      vector-effect: non-scaling-stroke;
+    }
+
+    /* ================= LUNA ================= */
+    .moon-glow-ring {
+      position: absolute;
+      top: 33%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220, 230, 255, 0.18) 0%, rgba(220, 230, 255, 0) 70%);
+    }
+
+    .moon-container {
+      position: absolute;
+      top: 33%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow:
+        0 0 40px rgba(230, 225, 240, 0.45),
+        0 0 100px rgba(180, 190, 255, 0.2);
+    }
+
+    #moonCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+
+    /* ================= ATARDECER ================= */
+    #sunsetCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .sun-sky-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 12% 15%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 35% 10%, #fff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 55% 20%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 75% 12%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 90% 25%, #fff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 22% 30%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 65% 32%, #fff 100%, transparent);
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .horizon-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 38%;
+      background: linear-gradient(180deg, rgba(74, 20, 40, 0) 0%, rgba(28, 8, 20, 0.85) 55%, #150610 100%);
+    }
+
+    .horizon-reflection {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 210px;
+      height: 70px;
+      background: linear-gradient(180deg, rgba(255, 150, 90, 0.35), rgba(255, 150, 90, 0));
+      filter: blur(6px);
+      border-radius: 50%;
+    }
+
+    .cloud-drift {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(ellipse 220px 30px at 20% 42%, rgba(255, 200, 170, 0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 260px 26px at 75% 50%, rgba(255, 180, 150, 0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 180px 24px at 45% 30%, rgba(255, 210, 190, 0.18) 0%, transparent 70%);
+      animation: cloudMove 40s linear infinite alternate;
+    }
+
+    @keyframes cloudMove {
+      0% {
+        transform: translateX(-15px);
       }
 
       100% {
-        transform: translateY(100vh) translateX(50px);
-        opacity: 0;
+        transform: translateX(15px);
       }
+    }
+
+    /* ================= NEBULOSA ================= */
+    .nebula-cloud {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 40%, rgba(236, 72, 153, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 68% 55%, rgba(139, 92, 246, 0.32) 0%, transparent 50%),
+        radial-gradient(circle at 50% 65%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
+        radial-gradient(circle at 42% 30%, rgba(255, 120, 150, 0.2) 0%, transparent 40%);
+      filter: blur(34px);
+      animation: nebulaPulse 14s infinite alternate ease-in-out;
+    }
+
+    @keyframes nebulaPulse {
+      0% {
+        transform: scale(1) rotate(0deg);
+        opacity: .85;
+      }
+
+      100% {
+        transform: scale(1.12) rotate(4deg);
+        opacity: 1;
+      }
+    }
+
+    .nebula-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 15% 25%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 40% 60%, #fff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 65% 20%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 80% 70%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 25% 80%, #fff 100%, transparent),
+        radial-gradient(1.5px 1.5px at 90% 40%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 55% 85%, #fff 100%, transparent);
+      opacity: .75;
+    }
+
+    .nebula-core {
+      position: absolute;
+      top: 38%;
+      left: 58%;
+      transform: translate(-50%, -50%);
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, #ffd7ea 30%, rgba(255, 215, 234, 0) 75%);
+      filter: blur(2px);
+      animation: corePulse 3.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes corePulse {
+      0% {
+        opacity: .7;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+    }
+
+    /* --- MENÚ LATERAL --- */
+    .menu-toggle {
+      position: fixed;
+      top: 22px;
+      left: 22px;
+      z-index: 100;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      font-size: .85rem;
+      letter-spacing: .5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .35s;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(230, 35, 53, .3);
+      box-shadow: 0 0 20px rgba(230, 35, 53, .45);
+      transform: translateY(-1px);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 290px;
+      height: 100%;
+      background: rgba(8, 4, 7, 0.92);
+      backdrop-filter: blur(22px);
+      border-right: 1px solid var(--glass-border);
+      z-index: 99;
+      padding: 90px 22px 30px;
+      transition: left .45s cubic-bezier(.65, 0, .35, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sidebar.open {
+      left: 0;
+      box-shadow: 20px 0 60px rgba(0, 0, 0, .5);
+    }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .nav-section h3 {
+      color: var(--crimson-bright);
+      font-family: 'Poppins', sans-serif;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      margin-bottom: 6px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid rgba(255, 82, 99, .2);
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid rgba(255, 255, 255, .07);
+      color: #e3dbdd;
+      padding: 11px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all .3s;
+      font-size: .88rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: rgba(230, 35, 53, .22);
+      border-color: var(--crimson-bright);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(230, 35, 53, .28);
+      transform: translateX(2px);
+    }
+
+    /* --- CONTENIDO --- */
+    .view-panel {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .view-panel.active-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .container {
       text-align: center;
-      position: relative;
       width: 90%;
       max-width: 600px;
-      z-index: 1;
-      /* Por encima de las estrellas */
+    }
+
+    .eyebrow {
+      font-size: .72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .85;
+      margin-bottom: 6px;
+      font-family: 'Poppins', sans-serif;
     }
 
     .flower-wrapper {
       cursor: pointer;
-      margin: 20px auto;
+      margin: 14px auto;
       width: 320px;
       height: 320px;
-      transition: transform 0.4s ease;
+      transition: transform .4s ease;
       position: relative;
+    }
+
+    .flower-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 20%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(230, 35, 53, .18) 0%, rgba(230, 35, 53, 0) 70%);
+      z-index: -1;
     }
 
     .flower-wrapper:hover {
       transform: scale(1.04);
     }
 
-    /* --- ESTILOS DE DIBUJO Y FLOR --- */
     .stem-base {
       stroke: #224227;
       stroke-width: 4.5;
@@ -103,18 +711,18 @@
       fill: #8a0c1a;
       stroke: #e62335;
       stroke-width: 1.5;
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition: opacity .6s ease, transform .6s ease;
       animation: pulse 2s infinite alternate ease-in-out;
       transform-origin: 150px 180px;
     }
 
     @keyframes pulse {
       0% {
-        filter: drop-shadow(0 0 4px rgba(230, 35, 53, 0.4));
+        filter: drop-shadow(0 0 4px rgba(230, 35, 53, .4));
       }
 
       100% {
-        filter: drop-shadow(0 0 16px rgba(230, 35, 53, 0.9));
+        filter: drop-shadow(0 0 16px rgba(230, 35, 53, .9));
       }
     }
 
@@ -165,26 +773,26 @@
     }
 
     .anther {
-      fill: #ffd700;
+      fill: var(--gold);
       opacity: 0;
-      transition: opacity 0.8s ease;
+      transition: opacity .8s ease;
     }
 
     .bloomed .petal-path {
       stroke-dashoffset: 0;
-      fill-opacity: 0.75;
+      fill-opacity: .78;
     }
 
     .bloomed .layer-back {
-      transition-delay: 0.2s;
+      transition-delay: .2s;
     }
 
     .bloomed .layer-mid-back {
-      transition-delay: 0.5s;
+      transition-delay: .5s;
     }
 
     .bloomed .layer-mid-front {
-      transition-delay: 0.8s;
+      transition-delay: .8s;
     }
 
     .bloomed .layer-front {
@@ -201,15 +809,15 @@
       transition-delay: 3s;
     }
 
-    /* --- TEXTOS Y CARTA CON EFECTO VIDRIO CRISTAL --- */
     .instruction {
-      color: #ff3c50;
-      font-size: 0.95rem;
-      letter-spacing: 2px;
+      color: var(--crimson-bright);
+      font-size: .82rem;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      margin-top: 10px;
-      transition: opacity 0.5s;
-      text-shadow: 0 0 10px rgba(255, 60, 80, 0.6);
+      margin-top: 6px;
+      transition: opacity .5s;
+      text-shadow: 0 0 12px rgba(255, 60, 80, .6);
+      font-family: 'Poppins', sans-serif;
     }
 
     .letter-card {
@@ -217,14 +825,13 @@
       transform: translateY(30px);
       pointer-events: none;
       transition: all 1s ease 3.4s;
-      background: rgba(15, 8, 12, 0.65);
-      border: 1px solid rgba(230, 35, 53, 0.4);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(230, 35, 53, 0.2);
-      margin-top: 20px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      padding: 34px 32px;
+      border-radius: 18px;
+      box-shadow: 0 12px 45px rgba(0, 0, 0, .6), 0 0 25px rgba(230, 35, 53, .18);
+      margin-top: 22px;
     }
 
     .letter-card.show {
@@ -234,140 +841,1279 @@
     }
 
     .letter-card h2 {
-      color: #ff5263;
-      margin-bottom: 15px;
-      font-weight: 300;
+      color: var(--crimson-bright);
+      margin-bottom: 14px;
+      font-size: 1.7rem;
+      font-weight: 500;
+      letter-spacing: .5px;
     }
 
     .letter-card p {
-      line-height: 1.8;
-      color: #e0e0e0;
-      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text-muted);
+      font-size: 1.08rem;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .world-info-card {
+      position: fixed;
+      bottom: 26px;
+      right: 26px;
+      z-index: 10;
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, .14);
+      backdrop-filter: blur(14px);
+      padding: 18px 22px;
+      border-radius: 14px;
+      max-width: 300px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, .5);
+    }
+
+    .world-info-card h2 {
+      font-size: 1.2rem;
+      color: var(--crimson-bright);
+      margin-bottom: 7px;
+      font-weight: 500;
+      letter-spacing: .3px;
+    }
+
+    .world-info-card p {
+      font-size: .85rem;
+      color: #d6cdd0;
+      line-height: 1.5;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+    }
+
+    @media (max-width:600px) {
+      .world-info-card {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+      }
+
+      .flower-wrapper {
+        width: 260px;
+        height: 260px;
+      }
     }
   </style>
 </head>
 
-<body>
+<body class="bg-stars">
 
-  <!-- Contenedor dinámico de estrellas en movimiento -->
-  <div class="starfield" id="starfield"></div>
+  <button class="menu-toggle" id="menuToggle">☰ <span>Menú</span></button>
 
-  <div class="container">
-    <div class="flower-wrapper" id="flower">
-      <svg viewBox="0 0 300 300" width="320" height="320">
-
-        <path class="stem-base" d="M150,290 Q148,230 150,180" />
-        <path class="receptacle" d="M144,180 C144,188 156,188 156,180 C158,175 142,175 144,180 Z" />
-
-        <g class="initial-bud">
-          <path d="M150,140 C140,160 144,180 150,180 C156,180 160,160 150,140 Z" />
-          <path d="M150,135 Q142,155 147,178" fill="none" stroke="#ff4d61" stroke-width="1" />
-          <path d="M150,135 Q158,155 153,178" fill="none" stroke="#ff4d61" stroke-width="1" />
-        </g>
-
-        <!-- CAPAS DE LA FLOR DE LYCORIS -->
-        <g>
-          <path class="petal-path layer-back" d="M146,178 Q110,140 80,130 C95,115 120,130 146,178 Z" />
-          <path class="petal-path layer-back" d="M146,178 Q120,120 100,90 C120,95 135,120 146,178 Z" />
-          <path class="petal-path layer-back" d="M154,178 Q190,140 220,130 C205,115 180,130 154,178 Z" />
-          <path class="petal-path layer-back" d="M154,178 Q180,120 200,90 C180,95 165,120 154,178 Z" />
-          <path class="petal-path layer-back" d="M150,178 Q150,110 150,70 C160,95 158,130 150,178 Z" />
-        </g>
-
-        <g>
-          <path class="petal-path layer-mid-back" d="M146,178 Q90,160 60,165 C75,145 110,150 146,178 Z" />
-          <path class="petal-path layer-mid-back" d="M154,178 Q210,160 240,165 C225,145 190,150 154,178 Z" />
-          <path class="petal-path layer-mid-back" d="M148,178 Q130,110 120,80 C138,90 142,120 148,178 Z" />
-          <path class="petal-path layer-mid-back" d="M152,178 Q170,110 180,80 C162,90 158,120 152,178 Z" />
-        </g>
-
-        <g>
-          <path class="petal-path layer-mid-front" d="M146,178 C110,170 80,190 55,200 C75,175 115,170 146,178 Z" />
-          <path class="petal-path layer-mid-front" d="M154,178 C190,170 220,190 245,200 C225,175 185,170 154,178 Z" />
-          <path class="petal-path layer-mid-front" d="M147,178 C130,140 100,120 75,100 C100,115 125,140 147,178 Z" />
-          <path class="petal-path layer-mid-front" d="M153,178 C170,140 200,120 225,100 C200,115 175,140 153,178 Z" />
-        </g>
-
-        <g>
-          <path class="petal-path layer-front" d="M148,178 Q125,185 100,215 Q125,195 148,178 Z" />
-          <path class="petal-path layer-front" d="M152,178 Q175,185 200,215 Q175,195 152,178 Z" />
-          <path class="petal-path layer-front" d="M150,178 Q140,140 135,115 Q148,140 150,178 Z" />
-          <path class="petal-path layer-front" d="M150,178 Q160,140 165,115 Q152,140 150,178 Z" />
-        </g>
-
-        <g>
-          <path class="stamen-path" d="M146,178 C100,150 50,120 25,75" />
-          <circle class="anther" cx="25" cy="75" r="2.5" />
-
-          <path class="stamen-path" d="M146,178 C90,130 45,80 35,35" />
-          <circle class="anther" cx="35" cy="35" r="2.5" />
-
-          <path class="stamen-path" d="M148,178 C110,110 80,50 75,15" />
-          <circle class="anther" cx="75" cy="15" r="2.5" />
-
-          <path class="stamen-path" d="M150,178 C135,100 130,40 125,5" />
-          <circle class="anther" cx="125" cy="5" r="2.5" />
-
-          <path class="stamen-path" d="M150,178 C165,100 170,40 175,5" />
-          <circle class="anther" cx="175" cy="5" r="2.5" />
-
-          <path class="stamen-path" d="M152,178 C190,110 220,50 225,15" />
-          <circle class="anther" cx="225" cy="15" r="2.5" />
-
-          <path class="stamen-path" d="M154,178 C210,130 255,80 265,35" />
-          <circle class="anther" cx="265" cy="35" r="2.5" />
-
-          <path class="stamen-path" d="M154,178 C200,150 250,120 275,75" />
-          <circle class="anther" cx="275" cy="75" r="2.5" />
-        </g>
-
-      </svg>
+  <div class="sidebar" id="sidebar">
+    <div class="nav-section">
+      <h3>Secciones</h3>
+      <button class="nav-btn active" onclick="switchSection('cards')">🌹 Carta y Flor</button>
+      <button class="nav-btn" onclick="switchSection('world')">🌌 Mundo</button>
     </div>
 
-    <p class="instruction" id="instruction">Toca la pantalla para que el lycoris florezca</p>
+    <div class="nav-section" id="worldOptionsSection">
+      <h3>Escenarios del Mundo</h3>
+      <button class="nav-btn active" onclick="setWorld('stars', event)">✨ Cielo Estrellado</button>
+      <button class="nav-btn" onclick="setWorld('eclipse', event)">🌑 Eclipse Solar</button>
+      <button class="nav-btn" onclick="setWorld('aurora', event)">🌌 Aurora Boreal</button>
+      <button class="nav-btn" onclick="setWorld('moon', event)">🌕 Luna Llena</button>
+      <button class="nav-btn" onclick="setWorld('sun', event)">🌅 Atardecer Solar</button>
+      <button class="nav-btn" onclick="setWorld('nebula', event)">🔮 Nebulosa Rosa</button>
+    </div>
+  </div>
 
-    <div class="letter-card" id="card">
-      <h2>Feliz día</h2>
-      <p>Llego tarde con el mensaje, alrededor de un día de retraso, pero no quería dejar pasar la fecha sin haberte
-        dado algo, estos días vos estuviste haciendo un esfuerzo enorme, estuviste haciendo unos detalles tan bonitos,
-        te esforzas tanto y solo te puedo decir lo orgulloso que estoy de vos, de la mujer tan fuerte, tan hermosa, tan
-        inteligente, tan dedicada, tan cariñosa, tan todo que sos, me inspiras a querer darte todo, gracias por todo lo
-        que haces. Ya pasó un mes desde
-        que nos conocemos y parecía que habían sido más,
-        muchos más, la conexión que tengo con vos hace que la noción del tiempo se altere y este mes se sienta como si
-        hubieran pasado años o incluso vidas. Mi tiempo con vos es tan valioso y quiero que este mes se convierta en un
-        futuro en lo que la misma noción del tiempo alterada trata de comunicar, toda una vida con vos y incluso más que
-        eso, sos mi mundo entero, sos mi vida completa, sos el amor de mi vida y más, Saskya Luzzy, te amo con mi alma y
-        feliz primer mes mi bebé hermosa</p>
+  <div class="vignette"></div>
+
+  <div class="starfield world-element active" id="elem-stars">
+    <canvas id="starsCanvas"></canvas>
+  </div>
+
+  <div class="world-element" id="elem-eclipse">
+    <canvas id="eclipseCanvas"></canvas>
+  </div>
+
+  <div class="world-element" id="elem-aurora">
+    <div class="aurora-sky-stars"></div>
+    <canvas id="auroraCanvas"></canvas>
+    <div class="aurora-horizon"></div>
+
+    <svg class="foreground-silhouette fs-far parallax-layer" data-parallax="10" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <path class="aurora-mountains-far"
+        d="M0,100 L0,60 C40,38 72,50 105,40 C145,28 175,54 215,42 C255,30 285,56 322,45 C352,36 378,52 400,44 L400,100 Z" />
+    </svg>
+
+    <svg class="foreground-silhouette fs-mid parallax-layer" data-parallax="16" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <path class="aurora-mountains-mid"
+        d="M0,100 L0,72 C36,50 66,64 96,54 C132,42 162,66 197,56 C227,46 258,68 292,58 C322,48 358,60 400,55 L400,100 Z" />
+    </svg>
+
+    <svg class="foreground-silhouette fs-near parallax-layer" data-parallax="22" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="auroraRidgeGlow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#39ffb0" stop-opacity="0" />
+          <stop offset="50%" stop-color="#8dffd8" stop-opacity=".5" />
+          <stop offset="100%" stop-color="#39ffb0" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path class="aurora-mountains-near"
+        d="M0,100 L0,82 C30,66 56,68 82,76 C112,86 144,64 177,67 C207,70 228,84 258,79 C288,74 308,58 338,63 C363,68 384,76 400,72 L400,100 Z" />
+      <path class="aurora-mountains-ridge-glow"
+        d="M0,82 C30,66 56,68 82,76 C112,86 144,64 177,67 C207,70 228,84 258,79 C288,74 308,58 338,63 C363,68 384,76 400,72" />
+    </svg>
+  </div>
+
+  <div class="world-element" id="elem-moon">
+    <div class="parallax-layer" data-parallax="6">
+      <div class="moon-glow-ring"></div>
+      <div class="moon-container"><canvas id="moonCanvas" width="420" height="420"></canvas></div>
+    </div>
+    <div class="parallax-layer" data-parallax="20" id="moonNearStars"></div>
+  </div>
+
+  <div class="world-element" id="elem-sun">
+    <canvas id="sunsetCanvas"></canvas>
+    <div class="parallax-layer" data-parallax="14">
+      <div class="cloud-drift"></div>
+    </div>
+    <div class="sun-sky-stars" id="sunStars"></div>
+    <div class="horizon-reflection"></div>
+    <div class="horizon-line"></div>
+
+    <svg class="foreground-silhouette fs-far parallax-layer" data-parallax="10" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <path class="sun-mountains-far"
+        d="M0,100 L0,58 C40,34 70,48 100,39 C140,27 170,52 210,41 C250,32 280,56 320,44 C350,37 375,50 400,42 L400,100 Z" />
+    </svg>
+
+    <svg class="foreground-silhouette fs-mid parallax-layer" data-parallax="16" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <path class="sun-mountains-mid"
+        d="M0,100 L0,70 C35,48 65,62 95,53 C130,42 160,64 195,55 C225,47 255,66 290,57 C320,49 355,60 400,54 L400,100 Z" />
+    </svg>
+
+    <svg class="foreground-silhouette fs-near parallax-layer" data-parallax="22" viewBox="0 0 400 100"
+      preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="ridgeGlow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ff7a45" stop-opacity="0" />
+          <stop offset="50%" stop-color="#ffb15c" stop-opacity=".55" />
+          <stop offset="100%" stop-color="#ff7a45" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path class="sun-mountains-near"
+        d="M0,100 L0,80 C30,64 55,66 80,74 C110,84 142,62 175,65 C205,68 226,82 256,77 C286,72 306,56 336,61 C361,66 382,74 400,70 L400,100 Z" />
+      <path class="sun-mountains-ridge-glow"
+        d="M0,80 C30,64 55,66 80,74 C110,84 142,62 175,65 C205,68 226,82 256,77 C286,72 306,56 336,61 C361,66 382,74 400,70" />
+    </svg>
+  </div>
+
+  <div class="world-element" id="elem-nebula">
+    <div class="parallax-layer" data-parallax="7">
+      <div class="nebula-cloud"></div>
+      <div class="nebula-core"></div>
+    </div>
+    <div class="parallax-layer" data-parallax="18">
+      <div class="nebula-stars"></div>
+    </div>
+  </div>
+
+  <!-- VISTA 1: CARTA Y FLOR -->
+  <div class="view-panel active-panel" id="panel-cards">
+    <div class="container">
+      <p class="eyebrow">Lycoris Radiata</p>
+      <div class="flower-wrapper" id="flower">
+        <svg viewBox="0 0 300 300" width="320" height="320">
+          <path class="stem-base" d="M150,290 Q148,230 150,180" />
+          <path class="receptacle" d="M144,180 C144,188 156,188 156,180 C158,175 142,175 144,180 Z" />
+
+          <g class="initial-bud">
+            <path d="M150,140 C140,160 144,180 150,180 C156,180 160,160 150,140 Z" />
+            <path d="M150,135 Q142,155 147,178" fill="none" stroke="#ff4d61" stroke-width="1" />
+            <path d="M150,135 Q158,155 153,178" fill="none" stroke="#ff4d61" stroke-width="1" />
+          </g>
+
+          <g>
+            <path class="petal-path layer-back" d="M146,178 Q110,140 80,130 C95,115 120,130 146,178 Z" />
+            <path class="petal-path layer-back" d="M146,178 Q120,120 100,90 C120,95 135,120 146,178 Z" />
+            <path class="petal-path layer-back" d="M154,178 Q190,140 220,130 C205,115 180,130 154,178 Z" />
+            <path class="petal-path layer-back" d="M154,178 Q180,120 200,90 C180,95 165,120 154,178 Z" />
+            <path class="petal-path layer-back" d="M150,178 Q150,110 150,70 C160,95 158,130 150,178 Z" />
+          </g>
+
+          <g>
+            <path class="petal-path layer-mid-back" d="M146,178 Q90,160 60,165 C75,145 110,150 146,178 Z" />
+            <path class="petal-path layer-mid-back" d="M154,178 Q210,160 240,165 C225,145 190,150 154,178 Z" />
+            <path class="petal-path layer-mid-back" d="M148,178 Q130,110 120,80 C138,90 142,120 148,178 Z" />
+            <path class="petal-path layer-mid-back" d="M152,178 Q170,110 180,80 C162,90 158,120 152,178 Z" />
+          </g>
+
+          <g>
+            <path class="petal-path layer-mid-front" d="M146,178 C110,170 80,190 55,200 C75,175 115,170 146,178 Z" />
+            <path class="petal-path layer-mid-front" d="M154,178 C190,170 220,190 245,200 C225,175 185,170 154,178 Z" />
+            <path class="petal-path layer-mid-front" d="M147,178 C130,140 100,120 75,100 C100,115 125,140 147,178 Z" />
+            <path class="petal-path layer-mid-front" d="M153,178 C170,140 200,120 225,100 C200,115 175,140 153,178 Z" />
+          </g>
+
+          <g>
+            <path class="petal-path layer-front" d="M148,178 Q125,185 100,215 Q125,195 148,178 Z" />
+            <path class="petal-path layer-front" d="M152,178 Q175,185 200,215 Q175,195 152,178 Z" />
+            <path class="petal-path layer-front" d="M150,178 Q140,140 135,115 Q148,140 150,178 Z" />
+            <path class="petal-path layer-front" d="M150,178 Q160,140 165,115 Q152,140 150,178 Z" />
+          </g>
+
+          <g>
+            <path class="stamen-path" d="M146,178 C100,150 50,120 25,75" />
+            <circle class="anther" cx="25" cy="75" r="2.5" />
+            <path class="stamen-path" d="M146,178 C90,130 45,80 35,35" />
+            <circle class="anther" cx="35" cy="35" r="2.5" />
+            <path class="stamen-path" d="M148,178 C110,110 80,50 75,15" />
+            <circle class="anther" cx="75" cy="15" r="2.5" />
+            <path class="stamen-path" d="M150,178 C135,100 130,40 125,5" />
+            <circle class="anther" cx="125" cy="5" r="2.5" />
+            <path class="stamen-path" d="M150,178 C165,100 170,40 175,5" />
+            <circle class="anther" cx="175" cy="5" r="2.5" />
+            <path class="stamen-path" d="M152,178 C190,110 220,50 225,15" />
+            <circle class="anther" cx="225" cy="15" r="2.5" />
+            <path class="stamen-path" d="M154,178 C210,130 255,80 265,35" />
+            <circle class="anther" cx="265" cy="35" r="2.5" />
+            <path class="stamen-path" d="M154,178 C200,150 250,120 275,75" />
+            <circle class="anther" cx="275" cy="75" r="2.5" />
+          </g>
+        </svg>
+      </div>
+
+      <p class="instruction" id="instruction">Toca la pantalla para que el lycoris florezca</p>
+
+      <div class="letter-card" id="card">
+        <h2>Feliz día</h2>
+        <p>Llego tarde con el mensaje, alrededor de un día de retraso, pero no quería dejar pasar la fecha sin haberte
+          dado algo, estos días vos estuviste haciendo un esfuerzo enorme, estuviste haciendo unos detalles tan bonitos,
+          te esforzas tanto y solo te puedo decir lo orgulloso que estoy de vos, de la mujer tan fuerte, tan hermosa,
+          tan
+          inteligente, tan dedicada, tan cariñosa, tan todo que sos, me inspiras a querer darte todo, gracias por todo
+          lo
+          que haces. Ya pasó un mes desde
+          que nos conocemos y parecía que habían sido más,
+          muchos más, la conexión que tengo con vos hace que la noción del tiempo se altere y este mes se sienta como si
+          hubieran pasado años o incluso vidas. Mi tiempo con vos es tan valioso y quiero que este mes se convierta en
+          un
+          futuro en lo que la misma noción del tiempo alterada trata de comunicar, toda una vida con vos y incluso más
+          que
+          eso, sos mi mundo entero, sos mi vida completa, sos el amor de mi vida y más, Saskya Luzzy, te amo con mi alma
+          y
+          feliz primer mes mi bebé hermosa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA 2: MUNDO -->
+  <div class="view-panel" id="panel-world">
+    <div class="world-info-card">
+      <h2 id="worldTitle">Cielo Estrellado</h2>
+      <p id="worldDesc">Un manto infinito de estrellas titilantes, atravesado de vez en cuando por una estrella fugaz.
+      </p>
+    </div>
+
+    <div class="parallax-hint" id="parallaxHint">🖱️ Mové el mouse (o el dedo) para mirar alrededor</div>
+
+    <div class="scene-control" id="starsControl">
+      <div class="control-label"><span>Quieto</span><span>Velocidad</span><span>Vertiginoso</span></div>
+      <input type="range" id="starsSpeedSlider" min="0" max="2" step="0.01" value="0.6">
+      <div class="control-hint">✨ Tocá el cielo para lanzar una estrella fugaz</div>
+    </div>
+
+    <div class="scene-control" id="eclipseControl">
+      <div class="control-label"><span>Amanecer</span><span>Totalidad</span><span>Atardecer</span></div>
+      <input type="range" id="eclipseSlider" min="0" max="100" value="15">
+    </div>
+
+    <div class="scene-control" id="sunControl">
+      <div class="control-label"><span>Día</span><span>Atardecer</span><span>Noche</span></div>
+      <input type="range" id="sunSlider" min="0" max="100" value="50">
     </div>
   </div>
 
   <script>
-    // Generar estrellas dinámicamente con JS
-    const starfield = document.getElementById('starfield');
-    const starCount = 45; // Cantidad de estrellas en la lluvia
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
 
-    for (let i = 0; i < starCount; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-
-      const size = Math.random() * 3 + 1; // Tamaño de 1 a 4px
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * -20}%`; // Empiezan arriba
-
-      const duration = Math.random() * 4 + 3; // Velocidad entre 3 y 7s
-      const delay = Math.random() * 5;
-
-      star.style.animationDuration = `${duration}s`;
-      star.style.animationDelay = `${delay}s`;
-
-      starfield.appendChild(star);
+    function switchSection(section) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-panel'));
+      document.getElementById(section === 'cards' ? 'panel-cards' : 'panel-world').classList.add('active-panel');
+      document.querySelectorAll('.nav-section')[0].querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      sidebar.classList.remove('open');
     }
 
-    // Interacción de la flor
+    const worldsInfo = {
+      stars: { title: "Cielo Estrellado", desc: "Un manto infinito de estrellas titilantes, atravesado de vez en cuando por una estrella fugaz.", bg: "bg-stars" },
+      eclipse: { title: "Eclipse Solar", desc: "La luna cubre al sol y deja ver su corona dorada, con un breve destello de diamante en el borde.", bg: "bg-eclipse" },
+      aurora: { title: "Aurora Boreal", desc: "Cortinas de luz verde y violeta ondulan lentamente sobre el horizonte ártico.", bg: "bg-aurora" },
+      moon: { title: "Luna Llena", desc: "La calma de la noche iluminada por el relieve, los mares y los cráteres de la luna.", bg: "bg-moon" },
+      sun: { title: "Atardecer Solar", desc: "Tonos dorados y carmesí despiden el día mientras el sol se hunde en el horizonte.", bg: "bg-sun" },
+      nebula: { title: "Nebulosa Rosa", desc: "Polvo estelar y gases cósmicos resplandeciendo en tonos rosa y violeta en la inmensidad del espacio.", bg: "bg-nebula" }
+    };
+
+    function setWorld(worldKey, ev) {
+      const body = document.body;
+      const world = worldsInfo[worldKey];
+      body.style.background = ''; // limpia colores dinámicos de escenas anteriores
+      body.className = world.bg;
+
+      // Elegir un escenario lleva automáticamente a la sección "Mundo"
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-panel'));
+      document.getElementById('panel-world').classList.add('active-panel');
+      document.querySelectorAll('.nav-section')[0].querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-section')[0].querySelectorAll('.nav-btn')[1].classList.add('active');
+
+      document.querySelectorAll('.world-element').forEach(el => el.classList.remove('active'));
+      const targetElem = document.getElementById(`elem-${worldKey}`);
+      if (targetElem) targetElem.classList.add('active');
+
+      document.getElementById('worldTitle').innerText = world.title;
+      document.getElementById('worldDesc').innerText = world.desc;
+
+      document.querySelectorAll('#worldOptionsSection .nav-btn').forEach(btn => btn.classList.remove('active'));
+      if (ev && ev.target) ev.target.classList.add('active');
+
+      // Controles interactivos según la escena
+      document.getElementById('starsControl').classList.toggle('show', worldKey === 'stars');
+      document.getElementById('eclipseControl').classList.toggle('show', worldKey === 'eclipse');
+      document.getElementById('sunControl').classList.toggle('show', worldKey === 'sun');
+      const starsCanvasEl = document.getElementById('starsCanvas');
+      if (starsCanvasEl) starsCanvasEl.style.pointerEvents = (worldKey === 'stars') ? 'auto' : 'none';
+
+      if (worldKey === 'eclipse') { if (typeof drawEclipse === 'function') drawEclipse(performance.now()); flashHint('👆 Arrastrá el control para ver el eclipse'); }
+      else if (worldKey === 'sun') { updateSun(); flashHint('👆 Arrastrá el control para ver caer el sol'); }
+      else if (worldKey === 'stars') { flashHint('✨ Tocá el cielo para lanzar una estrella fugaz'); }
+      else { flashHint('🖱️ Mové el mouse (o el dedo) para mirar alrededor'); }
+    }
+
+    // ================= CIELO ESTRELLADO (canvas, 3 capas de profundidad + fugaces) =================
+    const starsCanvas = document.getElementById('starsCanvas');
+    const sctx = starsCanvas.getContext('2d');
+    const starsSpeedSlider = document.getElementById('starsSpeedSlider');
+    let sfDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+
+    function sfResize() {
+      sfDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      starsCanvas.width = Math.floor(window.innerWidth * sfDPR);
+      starsCanvas.height = Math.floor(window.innerHeight * sfDPR);
+      starsCanvas.style.width = window.innerWidth + 'px';
+      starsCanvas.style.height = window.innerHeight + 'px';
+      sctx.setTransform(sfDPR, 0, 0, sfDPR, 0, 0);
+    }
+    window.addEventListener('resize', sfResize);
+    sfResize();
+
+    function sfRand(min, max) { return Math.random() * (max - min) + min; }
+
+    // Tres capas de profundidad: fondo estático, titilar lento, y estrellas dinámicas más grandes
+    const SF_LAYERS = [
+      { count: 130, speed: 0.02, size: 1, twinkle: true },
+      { count: 55, speed: 0.06, size: 1.6, twinkle: true },
+      { count: 18, speed: 0.18, size: 2.6, twinkle: false }
+    ];
+
+    const sfStars = [];
+    function sfMakeStar(layer) {
+      const angle = sfRand(-Math.PI / 8, Math.PI / 8);
+      const speed = SF_LAYERS[layer].speed * (0.6 + Math.random() * 0.9);
+      const size = SF_LAYERS[layer].size * (0.75 + Math.random() * 0.9);
+      return {
+        x: sfRand(0, window.innerWidth), y: sfRand(0, window.innerHeight),
+        angle, speed, size, layer,
+        twinklePhase: Math.random() * Math.PI * 2,
+        baseAlpha: 0.6 + Math.random() * 0.6,
+        driftX: sfRand(-0.02, 0.02)
+      };
+    }
+    for (let l = 0; l < SF_LAYERS.length; l++) {
+      for (let i = 0; i < SF_LAYERS[l].count; i++) sfStars.push(sfMakeStar(l));
+    }
+
+    // Estrellas fugaces: aparecen solas de a poco (proceso de Poisson) o al tocar la pantalla
+    const sfShooting = [];
+    function sfSpawnShooting(x, y) {
+      const sx = x !== undefined ? x : sfRand(0, window.innerWidth * 0.9);
+      const sy = y !== undefined ? y : sfRand(0, window.innerHeight * 0.35);
+      sfShooting.push({
+        x: sx, y: sy,
+        len: sfRand(120, 380),
+        angle: sfRand(-0.3, -0.7),
+        speed: sfRand(6, 12),
+        life: 0, alpha: 1
+      });
+    }
+    let sfLastSpawn = 0;
+
+    function sfDraw(now) {
+      const stEl = document.getElementById('elem-stars');
+      const w = window.innerWidth, h = window.innerHeight;
+      if (!stEl || !stEl.classList.contains('active')) {
+        sctx.clearRect(0, 0, w, h);
+        sfDraw._last = now;
+        return;
+      }
+      const dt = Math.min(40, now - (sfDraw._last || now)) / 1000;
+      sfDraw._last = now;
+
+      sctx.clearRect(0, 0, w, h);
+
+      // leve paralaje de cámara, coherente con el resto de la página
+      const camFar = curX * 4, camNear = curX * 10;
+
+      const globalSpeed = starsSpeedSlider ? parseFloat(starsSpeedSlider.value) : 0.6;
+
+      for (const s of sfStars) {
+        const layerDef = SF_LAYERS[s.layer];
+        const orbital = Math.sin((now * 0.0002 + s.twinklePhase) * (0.5 + s.layer * 0.6)) * (2 + s.layer * 1.5);
+        s.x += Math.cos(s.angle) * s.speed * globalSpeed * 30 * dt + s.driftX;
+        s.y += Math.sin(s.angle) * s.speed * globalSpeed * 30 * dt + orbital * 0.02;
+
+        if (s.x < -30) { s.x = w + sfRand(0, 40); s.y = sfRand(0, h); }
+        if (s.x > w + 30) { s.x = -sfRand(0, 40); s.y = sfRand(0, h); }
+        if (s.y > h + 40) { s.y = -sfRand(0, 40); s.x = sfRand(0, w); }
+        if (s.y < -40) { s.y = h + sfRand(0, 40); s.x = sfRand(0, w); }
+
+        let alpha = s.baseAlpha;
+        if (layerDef.twinkle) alpha = s.baseAlpha * (0.5 + 0.5 * Math.sin((now * 0.003) + s.twinklePhase));
+
+        const cam = s.layer === 2 ? camNear : camFar;
+        const dx = s.x + cam, dy = s.y + camFar * 0.5;
+
+        const grd = sctx.createRadialGradient(dx, dy, 0, dx, dy, s.size * 3);
+        grd.addColorStop(0, `rgba(255,255,255,${alpha})`);
+        grd.addColorStop(0.4, `rgba(255,255,255,${alpha * 0.4})`);
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        sctx.fillStyle = grd;
+        sctx.beginPath();
+        sctx.arc(dx, dy, s.size, 0, Math.PI * 2);
+        sctx.fill();
+      }
+
+      for (let i = sfShooting.length - 1; i >= 0; i--) {
+        const sh = sfShooting[i];
+        sh.life += dt;
+        sh.x += Math.cos(sh.angle) * sh.speed * (1 + globalSpeed) * 60 * dt;
+        sh.y += Math.sin(sh.angle) * sh.speed * (1 + globalSpeed) * 60 * dt;
+        sh.alpha = Math.max(0, 1 - sh.life * 1.4);
+
+        sctx.strokeStyle = `rgba(255,255,255,${0.8 * sh.alpha})`;
+        sctx.lineWidth = 2;
+        sctx.beginPath();
+        sctx.moveTo(sh.x, sh.y);
+        sctx.lineTo(sh.x - Math.cos(sh.angle) * sh.len, sh.y - Math.sin(sh.angle) * sh.len);
+        sctx.stroke();
+
+        const g = sctx.createRadialGradient(sh.x, sh.y, 0, sh.x, sh.y, 18);
+        g.addColorStop(0, `rgba(255,255,255,${sh.alpha})`);
+        g.addColorStop(0.6, `rgba(255,255,255,${sh.alpha * 0.2})`);
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        sctx.fillStyle = g;
+        sctx.beginPath(); sctx.arc(sh.x, sh.y, 4, 0, Math.PI * 2); sctx.fill();
+
+        if (sh.alpha <= 0 || sh.x < -500 || sh.x > w + 500 || sh.y < -500 || sh.y > h + 500) sfShooting.splice(i, 1);
+      }
+
+      if (now - sfLastSpawn > 700 + Math.random() * 2000) {
+        if (Math.random() < 0.6) sfSpawnShooting();
+        sfLastSpawn = now;
+      }
+    }
+
+    function sfLoop(t) {
+      sfDraw(t || 0);
+      requestAnimationFrame(sfLoop);
+    }
+    requestAnimationFrame(sfLoop);
+
+    // Tocar / hacer clic en el cielo lanza una estrella fugaz desde ese punto
+    starsCanvas.addEventListener('click', e => {
+      const rect = starsCanvas.getBoundingClientRect();
+      sfSpawnShooting(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    starsCanvas.addEventListener('touchstart', e => {
+      if (!e.touches[0]) return;
+      const rect = starsCanvas.getBoundingClientRect();
+      sfSpawnShooting(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+    }, { passive: true });
+
+    function makeTwinkle(container, size) {
+      const star = document.createElement('div');
+      star.className = 'twinkle';
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      container.appendChild(star);
+    }
+
+    // Estrellas cercanas para la escena de la luna
+    const moonNearStars = document.getElementById('moonNearStars');
+    for (let i = 0; i < 18; i++) makeTwinkle(moonNearStars, Math.random() * 1.6 + 1);
+
+    // ================= PARALLAX (mouse / touch) =================
+    let targetX = 0, targetY = 0, curX = 0, curY = 0;
+    function applyParallax(nx, ny) {
+      targetX = nx; targetY = ny;
+    }
+    window.addEventListener('pointermove', e => {
+      applyParallax((e.clientX / window.innerWidth - 0.5) * 2, (e.clientY / window.innerHeight - 0.5) * 2);
+    });
+    window.addEventListener('touchmove', e => {
+      if (!e.touches[0]) return;
+      const t = e.touches[0];
+      applyParallax((t.clientX / window.innerWidth - 0.5) * 2, (t.clientY / window.innerHeight - 0.5) * 2);
+    }, { passive: true });
+    // Giroscopio en móviles, si el navegador lo permite sin pedir permiso explícito
+    window.addEventListener('deviceorientation', e => {
+      if (e.gamma == null || e.beta == null) return;
+      applyParallax(Math.max(-1, Math.min(1, e.gamma / 30)), Math.max(-1, Math.min(1, (e.beta - 40) / 30)));
+    });
+
+    function parallaxLoop() {
+      curX += (targetX - curX) * 0.06;
+      curY += (targetY - curY) * 0.06;
+      document.querySelectorAll('.parallax-layer').forEach(el => {
+        const depth = parseFloat(el.dataset.parallax || 0);
+        if (!depth) return;
+        el.style.transform = `translate(${curX * depth}px, ${curY * depth * 0.55}px)`;
+      });
+      requestAnimationFrame(parallaxLoop);
+    }
+    parallaxLoop();
+
+    // Aviso de "mirá alrededor" — aparece un momento al entrar a cada escena
+    const parallaxHint = document.getElementById('parallaxHint');
+    let hintTimeout;
+    function flashHint(text) {
+      clearTimeout(hintTimeout);
+      parallaxHint.textContent = text;
+      parallaxHint.classList.add('show');
+      hintTimeout = setTimeout(() => parallaxHint.classList.remove('show'), 3200);
+    }
+
+    // ================= ECLIPSE SOLAR REALISTA (canvas) =================
+    const eclipseSlider = document.getElementById('eclipseSlider');
+    const eclipseCanvas = document.getElementById('eclipseCanvas');
+    const ectx = eclipseCanvas.getContext('2d');
+    const eDpr = Math.min(window.devicePixelRatio || 1, 2);
+    let eW = 0, eH = 0;
+
+    // Estrellas de fondo fijas (posiciones estables, solo cambia su opacidad)
+    const eclipseStarField = Array.from({ length: 140 }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.3 + 0.3,
+      tw: Math.random() * Math.PI * 2
+    }));
+
+    // Textura de granulación solar (manchas sutiles de brillo, fijas en el espacio del sol)
+    const granulation = Array.from({ length: 220 }, () => {
+      const a = Math.random() * Math.PI * 2;
+      const rr = Math.sqrt(Math.random());
+      return { a, rr, s: Math.random() * 0.55 + 0.2, br: Math.random() * 0.5 - 0.25 };
+    });
+
+    // Ángulos de los penachos de la corona (fijos, con leve variación de largo)
+    const coronaStreamers = Array.from({ length: 46 }, () => ({
+      a: Math.random() * Math.PI * 2,
+      len: Math.random() * 1.6 + 1.1,
+      w: Math.random() * 0.035 + 0.012
+    }));
+
+    function resizeEclipseCanvas() {
+      eW = window.innerWidth; eH = window.innerHeight;
+      eclipseCanvas.width = eW * eDpr;
+      eclipseCanvas.height = eH * eDpr;
+      eclipseCanvas.style.width = eW + 'px';
+      eclipseCanvas.style.height = eH + 'px';
+      ectx.setTransform(eDpr, 0, 0, eDpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeEclipseCanvas);
+
+    function mixRGB(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+    function rgbStr(c, alpha) { return alpha === undefined ? `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})` : `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${alpha})`; }
+
+    // Área de intersección de dos círculos -> fracción del sol cubierta por la luna
+    function overlapFraction(R, r, d) {
+      if (d >= R + r) return 0;
+      if (d <= Math.abs(R - r)) return 1;
+      const R2 = R * R, r2 = r * r, d2 = d * d;
+      const alpha = Math.acos(Math.min(1, Math.max(-1, (d2 + R2 - r2) / (2 * d * R))));
+      const beta = Math.acos(Math.min(1, Math.max(-1, (d2 + r2 - R2) / (2 * d * r))));
+      const area = R2 * (alpha - Math.sin(2 * alpha) / 2) + r2 * (beta - Math.sin(2 * beta) / 2);
+      return Math.min(1, area / (Math.PI * R2));
+    }
+
+    function circleIntersections(x0, y0, r0, x1, y1, r1) {
+      const dx = x1 - x0, dy = y1 - y0;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d > r0 + r1 || d < Math.abs(r0 - r1) || d === 0) return null;
+      const a = (r0 * r0 - r1 * r1 + d * d) / (2 * d);
+      const h = Math.sqrt(Math.max(0, r0 * r0 - a * a));
+      const xm = x0 + a * dx / d, ym = y0 + a * dy / d;
+      return [[xm + h * dy / d, ym - h * dx / d], [xm - h * dy / d, ym + h * dx / d]];
+    }
+
+    // ============ TEXTURAS PROCEDURALES (ruido fractal, generadas una sola vez) ============
+    // Ruido de valor con interpolación suave + fBm (fractal Brownian motion)
+    function makeValueNoise(seed) {
+      const perm = new Uint8Array(512);
+      let s = seed;
+      const rand = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      const p = Array.from({ length: 256 }, (_, i) => i);
+      for (let i = 255; i > 0; i--) { const j = Math.floor(rand() * (i + 1));[p[i], p[j]] = [p[j], p[i]]; }
+      for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+      const grads = Array.from({ length: 256 }, () => rand());
+      function smooth(t) { return t * t * (3 - 2 * t); }
+      function noise2(x, y) {
+        const xi = Math.floor(x) & 255, yi = Math.floor(y) & 255;
+        const xf = x - Math.floor(x), yf = y - Math.floor(y);
+        const v00 = grads[perm[perm[xi] + yi] & 255], v10 = grads[perm[perm[xi + 1] + yi] & 255];
+        const v01 = grads[perm[perm[xi] + yi + 1] & 255], v11 = grads[perm[perm[xi + 1] + yi + 1] & 255];
+        const u = smooth(xf), v = smooth(yf);
+        return v00 * (1 - u) * (1 - v) + v10 * u * (1 - v) + v01 * (1 - u) * v + v11 * u * v;
+      }
+      return function fbm(x, y, octaves, lacunarity, gain) {
+        let amp = 1, freq = 1, sum = 0, norm = 0;
+        for (let o = 0; o < octaves; o++) {
+          sum += noise2(x * freq, y * freq) * amp;
+          norm += amp;
+          amp *= gain; freq *= lacunarity;
+        }
+        return sum / norm;
+      };
+    }
+
+    const TEX_SIZE = 512;
+
+    // --- TEXTURA DEL SOL: granulación convectiva + manchas solares + filamentos ---
+    function buildSunTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = TEX_SIZE;
+      const g = c.getContext('2d');
+      const fbm = makeValueNoise(1337);
+      const fbm2 = makeValueNoise(4242);
+      const img = g.createImageData(TEX_SIZE, TEX_SIZE);
+      const data = img.data;
+      for (let y = 0; y < TEX_SIZE; y++) {
+        for (let x = 0; x < TEX_SIZE; x++) {
+          // granulación fina (celdas convectivas) + variación de brillo a gran escala
+          const n1 = fbm(x / 9, y / 9, 4, 2.1, 0.55);          // gránulos pequeños
+          const n2 = fbm(x / 60, y / 60, 4, 2.0, 0.5);         // zonas activas grandes
+          const n3 = fbm2(x / 22, y / 22, 3, 2.2, 0.5);        // filamentos intermedios
+          let b = 0.55 * n1 + 0.25 * n3 + 0.2 * n2;              // 0..1 brillo combinado
+          // manchas solares: donde el ruido de gran escala es muy bajo, oscurecer fuerte
+          const spot = fbm2(x / 85, y / 85, 3, 2.0, 0.5);
+          if (spot < 0.28) {
+            const k = (0.28 - spot) / 0.28;                  // 0..1 intensidad de la mancha
+            b *= (1 - 0.85 * Math.min(1, k * 1.6));            // umbra oscura
+          }
+          // mapa de color tipo fotosfera: de naranja profundo a blanco amarillento
+          const i = (y * TEX_SIZE + x) * 4;
+          const r = 200 + b * 55;
+          const gg = 110 + b * 135;
+          const bb = 30 + b * 130;
+          data[i] = Math.min(255, r);
+          data[i + 1] = Math.min(255, gg);
+          data[i + 2] = Math.min(255, bb);
+          data[i + 3] = 255;
+        }
+      }
+      g.putImageData(img, 0, 0);
+      return c;
+    }
+
+    // --- TEXTURA DE LA LUNA: mares, tierras altas y cráteres con relieve (luz desde arriba-izq) ---
+    function buildMoonTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = TEX_SIZE;
+      const g = c.getContext('2d');
+      const fbm = makeValueNoise(777);
+      const fbm2 = makeValueNoise(2025);
+      const img = g.createImageData(TEX_SIZE, TEX_SIZE);
+      const data = img.data;
+      for (let y = 0; y < TEX_SIZE; y++) {
+        for (let x = 0; x < TEX_SIZE; x++) {
+          const highlands = fbm(x / 38, y / 38, 5, 2.1, 0.55);   // rugosidad general
+          const maria = fbm2(x / 95, y / 95, 4, 2.0, 0.5);       // manchas grandes (mares)
+          let v = 0.62 + (highlands - 0.5) * 0.5;                // gris base con rugosidad
+          if (maria < 0.42) v *= 0.55 + maria * 0.5;           // mares basálticos oscuros
+          const i = (y * TEX_SIZE + x) * 4;
+          const gray = Math.max(0, Math.min(255, v * 205));
+          data[i] = gray; data[i + 1] = gray; data[i + 2] = Math.min(255, gray * 1.04);
+          data[i + 3] = 255;
+        }
+      }
+      g.putImageData(img, 0, 0);
+
+      // Cráteres procedurales con borde iluminado y sombra interna (relieve 2.5D)
+      let s = 99991;
+      const rand = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      const craterCount = 90;
+      for (let k = 0; k < craterCount; k++) {
+        const cxk = rand() * TEX_SIZE, cyk = rand() * TEX_SIZE;
+        const r = (Math.pow(rand(), 2.2) * 26) + 2.5;        // muchos chicos, pocos grandes
+        // depresión interior (sombra hacia arriba-izquierda, luz llega de arriba-izq)
+        const inner = g.createRadialGradient(cxk - r * 0.25, cyk - r * 0.25, r * 0.1, cxk, cyk, r);
+        inner.addColorStop(0, 'rgba(0,0,0,0.42)');
+        inner.addColorStop(0.65, 'rgba(0,0,0,0.18)');
+        inner.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = inner;
+        g.beginPath(); g.arc(cxk, cyk, r, 0, Math.PI * 2); g.fill();
+        // borde brillante en el lado iluminado (abajo-derecha del anillo)
+        g.strokeStyle = `rgba(255,255,250,${0.10 + rand() * 0.15})`;
+        g.lineWidth = Math.max(0.6, r * 0.10);
+        g.beginPath(); g.arc(cxk, cyk, r * 0.98, Math.PI * 0.05, Math.PI * 0.75); g.stroke();
+        // borde en sombra en el lado opuesto
+        g.strokeStyle = `rgba(0,0,0,${0.12 + rand() * 0.15})`;
+        g.lineWidth = Math.max(0.6, r * 0.10);
+        g.beginPath(); g.arc(cxk, cyk, r * 0.98, Math.PI * 1.05, Math.PI * 1.75); g.stroke();
+        // rayos eyectados en cráteres grandes
+        if (r > 16 && rand() > 0.5) {
+          for (let ry = 0; ry < 7; ry++) {
+            const ang = rand() * Math.PI * 2;
+            const len = r * (1.5 + rand() * 2);
+            g.strokeStyle = `rgba(255,255,255,${0.045 + rand() * 0.04})`;
+            g.lineWidth = 1 + rand() * 1.5;
+            g.beginPath();
+            g.moveTo(cxk + Math.cos(ang) * r, cyk + Math.sin(ang) * r);
+            g.lineTo(cxk + Math.cos(ang) * len, cyk + Math.sin(ang) * len);
+            g.stroke();
+          }
+        }
+      }
+      return c;
+    }
+
+    let sunTexture = buildSunTexture();
+    let moonTexture = buildMoonTexture();
+
+    // ---- TEXTURAS REALES OPCIONALES (imágenes) ----
+    // Si existen los archivos texturas/sol.jpg y texturas/luna.jpg junto al HTML,
+    // se usan automáticamente en lugar de las texturas procedurales.
+    // Deben ser mapas equirectangulares (ancho ≈ 2x alto), p. ej. de NASA SVS / Solar System Scope.
+    function loadExternalTexture(url, apply) {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = TEX_SIZE; c.height = TEX_SIZE;
+        c.getContext('2d').drawImage(img, 0, 0, TEX_SIZE, TEX_SIZE);
+        apply(c);
+      };
+      img.onerror = () => { }; // si no existe, se mantiene la textura procedural
+      img.src = url;
+    }
+    loadExternalTexture('texturas/sol.jpg', c => { sunTexture = c; });
+    loadExternalTexture('texturas/luna.jpg', c => { moonTexture = c; });
+
+    // Dibuja una esfera texturizada, sin costuras: un solo trazo rotado lentamente
+    // (antes se cortaba en franjas verticales para simular curvatura, lo que generaba
+    // líneas visibles entre franjas por errores de redondeo; una rotación simple del
+    // propio mapa de textura da el mismo efecto de "astro vivo" sin ese artefacto).
+    function drawTexturedSphere(ctx2, tex, x, y, R, rotAngle, alpha) {
+      ctx2.save();
+      ctx2.beginPath(); ctx2.arc(x, y, R, 0, Math.PI * 2); ctx2.clip();
+      ctx2.globalAlpha = alpha;
+      ctx2.translate(x, y);
+      ctx2.rotate(rotAngle);
+      const size = R * 2 * 1.45; // agranda el cuadro para cubrir las esquinas al rotar
+      ctx2.drawImage(tex, -size / 2, -size / 2, size, size);
+      ctx2.restore();
+    }
+
+    function drawEclipse(t) {
+      if (!document.getElementById('elem-eclipse').classList.contains('active')) return;
+      if (!eW) resizeEclipseCanvas();
+
+      const v = parseFloat(eclipseSlider.value); // 0-100, 50 = totalidad
+      const camX = curX * 10, camY = curY * 6; // leve paralaje de cámara
+      const cx = eW / 2 + camX, cy = eH * 0.4 + camY;
+      const sunR = Math.max(46, Math.min(eW, eH) * 0.09);
+      const moonR = sunR * 1.045;
+      const maxOffset = sunR * 2.7;
+      const dir = v < 50 ? -1 : 1;
+      const d = Math.abs((v - 50) / 50) * maxOffset;
+      const moonX = cx + dir * d;
+      const moonY = cy;
+
+      const coverage = overlapFraction(sunR, moonR, d);
+      const skyDark = Math.pow(coverage, 2.4);
+
+      // --- CIELO ---
+      const top = mixRGB([20, 42, 86], [3, 3, 10], skyDark);
+      const bot = mixRGB([46, 58, 96], [8, 5, 14], skyDark);
+      const sky = ectx.createLinearGradient(0, 0, 0, eH);
+      sky.addColorStop(0, rgbStr(top));
+      sky.addColorStop(1, rgbStr(bot));
+      ectx.fillStyle = sky;
+      ectx.fillRect(0, 0, eW, eH);
+
+      // --- ESTRELLAS (aparecen a medida que oscurece) ---
+      if (skyDark > 0.1) {
+        ectx.save();
+        eclipseStarField.forEach(s => {
+          const tw = 0.55 + 0.45 * Math.sin(t / 700 + s.tw);
+          ectx.globalAlpha = Math.min(1, skyDark * 1.3) * tw;
+          ectx.fillStyle = '#fff';
+          ectx.beginPath();
+          ectx.arc(s.x * eW, s.y * eH * 0.85, s.r, 0, Math.PI * 2);
+          ectx.fill();
+        });
+        ectx.restore();
+      }
+
+      // --- RESPLANDOR DE HORIZONTE 360° (propio de la totalidad) ---
+      if (coverage > 0.75) {
+        const glow = Math.min(1, (coverage - 0.75) / 0.25);
+        const hgrad = ectx.createLinearGradient(0, eH * 0.72, 0, eH);
+        hgrad.addColorStop(0, 'rgba(255,140,80,0)');
+        hgrad.addColorStop(0.55, `rgba(255,130,70,${0.22 * glow})`);
+        hgrad.addColorStop(1, `rgba(255,150,90,${0.4 * glow})`);
+        ectx.fillStyle = hgrad;
+        ectx.fillRect(0, eH * 0.72, eW, eH * 0.28);
+      }
+
+      // --- CORONA (solo se aprecia cerca de la totalidad, luz tenue y perlada) ---
+      const coronaStrength = Math.max(0, (coverage - 0.88) / 0.12);
+      if (coronaStrength > 0.01) {
+        ectx.save();
+        // halo suave de base — tenue, como la luz perlada real de la corona
+        const halo = ectx.createRadialGradient(cx, cy, sunR * 0.98, cx, cy, sunR * 2.6);
+        halo.addColorStop(0, `rgba(235,232,225,${0.4 * coronaStrength})`);
+        halo.addColorStop(0.4, `rgba(220,220,220,${0.16 * coronaStrength})`);
+        halo.addColorStop(1, 'rgba(220,220,220,0)');
+        ectx.fillStyle = halo;
+        ectx.beginPath(); ectx.arc(cx, cy, sunR * 2.6, 0, Math.PI * 2); ectx.fill();
+
+        // penachos radiales (streamers), con leve movimiento, brillo suave
+        coronaStreamers.forEach(s => {
+          const wobble = Math.sin(t / 2600 + s.a * 3) * 0.08;
+          const ang = s.a + wobble;
+          const len = sunR * (1.1 + s.len * (0.55 + 0.25 * coronaStrength));
+          const x1 = cx + Math.cos(ang) * sunR * 0.98;
+          const y1 = cy + Math.sin(ang) * sunR * 0.98;
+          const x2 = cx + Math.cos(ang) * len;
+          const y2 = cy + Math.sin(ang) * len;
+          const grad = ectx.createLinearGradient(x1, y1, x2, y2);
+          grad.addColorStop(0, `rgba(230,228,220,${0.22 * coronaStrength})`);
+          grad.addColorStop(1, 'rgba(230,228,220,0)');
+          ectx.strokeStyle = grad;
+          ectx.lineWidth = sunR * s.w * 0.8;
+          ectx.beginPath();
+          ectx.moveTo(x1, y1); ectx.lineTo(x2, y2);
+          ectx.stroke();
+        });
+        ectx.restore();
+      }
+
+      // --- FOTOSFERA (superficie solar con granulación y oscurecimiento de limbo) ---
+      ectx.save();
+      ectx.beginPath(); ectx.arc(cx, cy, sunR, 0, Math.PI * 2); ectx.clip();
+      const photo = ectx.createRadialGradient(cx, cy, 0, cx, cy, sunR);
+      photo.addColorStop(0, '#fffdf2');
+      photo.addColorStop(0.55, '#fff1b8');
+      photo.addColorStop(0.85, '#ffcf6b');
+      photo.addColorStop(1, '#e88a3a');
+      ectx.fillStyle = photo;
+      ectx.fillRect(cx - sunR, cy - sunR, sunR * 2, sunR * 2);
+      granulation.forEach(g => {
+        const gx = cx + Math.cos(g.a) * g.rr * sunR;
+        const gy = cy + Math.sin(g.a) * g.rr * sunR;
+        ectx.fillStyle = g.br > 0 ? `rgba(255,255,240,${g.br * 0.4})` : `rgba(180,90,20,${-g.br * 0.35})`;
+        ectx.beginPath();
+        ectx.arc(gx, gy, sunR * g.s * 0.05, 0, Math.PI * 2);
+        ectx.fill();
+      });
+      ectx.restore();
+
+      // textura solar con proyección esférica (rotación lenta) + oscurecimiento de limbo
+      drawTexturedSphere(ectx, sunTexture, cx, cy, sunR, t * 0.00004, 0.55);
+      ectx.save();
+      ectx.beginPath(); ectx.arc(cx, cy, sunR, 0, Math.PI * 2); ectx.clip();
+      const limb = ectx.createRadialGradient(cx, cy, sunR * 0.55, cx, cy, sunR);
+      limb.addColorStop(0, 'rgba(120,40,0,0)');
+      limb.addColorStop(0.75, 'rgba(150,55,5,0.18)');
+      limb.addColorStop(1, 'rgba(120,35,0,0.55)');
+      ectx.fillStyle = limb;
+      ectx.fillRect(cx - sunR, cy - sunR, sunR * 2, sunR * 2);
+      // leve brillo central (da volumen a la esfera)
+      const core = ectx.createRadialGradient(cx, cy, 0, cx, cy, sunR * 0.7);
+      core.addColorStop(0, 'rgba(255,255,235,0.30)');
+      core.addColorStop(1, 'rgba(255,255,235,0)');
+      ectx.fillStyle = core;
+      ectx.fillRect(cx - sunR, cy - sunR, sunR * 2, sunR * 2);
+      ectx.restore();
+
+      // --- CROMOSFERA (delgado anillo rosado, visible en la totalidad) ---
+      if (coverage > 0.97) {
+        const chromo = Math.min(1, (coverage - 0.97) / 0.03);
+        ectx.save();
+        ectx.beginPath();
+        ectx.arc(moonX, moonY, moonR * 1.008, 0, Math.PI * 2);
+        ectx.lineWidth = Math.max(1.2, sunR * 0.022);
+        ectx.strokeStyle = `rgba(255,80,90,${0.65 * chromo})`;
+        ectx.stroke();
+        ectx.restore();
+      }
+
+      // --- LUNA (cubre al sol) ---
+      const moonGrad = ectx.createRadialGradient(moonX - moonR * 0.3, moonY - moonR * 0.3, moonR * 0.1, moonX, moonY, moonR);
+      moonGrad.addColorStop(0, '#100e16');
+      moonGrad.addColorStop(0.7, '#070609');
+      moonGrad.addColorStop(1, '#020103');
+      ectx.fillStyle = moonGrad;
+      ectx.beginPath(); ectx.arc(moonX, moonY, moonR, 0, Math.PI * 2); ectx.fill();
+
+      // relieve lunar visible: más nítido lejos del sol, casi negro en la totalidad (como en fotos reales)
+      const moonLit = 0.10 + 0.30 * (1 - coverage);
+      drawTexturedSphere(ectx, moonTexture, moonX, moonY, moonR, t * 0.00001, moonLit);
+      // sombreado esférico (luz tenue desde el lado del sol) para volumen 3D
+      ectx.save();
+      ectx.beginPath(); ectx.arc(moonX, moonY, moonR, 0, Math.PI * 2); ectx.clip();
+      const lightDirX = cx >= moonX ? 1 : -1;
+      const shade = ectx.createRadialGradient(
+        moonX + lightDirX * moonR * 0.45, moonY - moonR * 0.2, moonR * 0.15,
+        moonX, moonY, moonR * 1.05);
+      shade.addColorStop(0, 'rgba(0,0,0,0)');
+      shade.addColorStop(0.6, 'rgba(0,0,0,0.35)');
+      shade.addColorStop(1, 'rgba(0,0,0,0.7)');
+      ectx.fillStyle = shade;
+      ectx.fillRect(moonX - moonR, moonY - moonR, moonR * 2, moonR * 2);
+      ectx.restore();
+
+      // --- CUENTAS DE BAILY + ANILLO DE DIAMANTE (justo en el contacto) ---
+      if (coverage > 0.95 && coverage < 1) {
+        const pts = circleIntersections(cx, cy, sunR, moonX, moonY, moonR);
+        if (pts) {
+          const [p1, p2] = pts;
+          const closeness = 1 - Math.min(1, Math.abs(1 - coverage) / 0.05);
+          const midX = (p1[0] + p2[0]) / 2, midY = (p1[1] + p2[1]) / 2;
+          const flareR = (4 + closeness * 12);
+          const rg = ectx.createRadialGradient(midX, midY, 0, midX, midY, flareR * 4);
+          rg.addColorStop(0, `rgba(255,255,255,${0.5 + 0.5 * closeness})`);
+          rg.addColorStop(0.3, `rgba(255,240,205,${0.55 * closeness})`);
+          rg.addColorStop(1, 'rgba(255,240,205,0)');
+          ectx.fillStyle = rg;
+          ectx.beginPath(); ectx.arc(midX, midY, flareR * 4, 0, Math.PI * 2); ectx.fill();
+          ectx.fillStyle = '#fff';
+          ectx.beginPath(); ectx.arc(midX, midY, flareR * 0.4, 0, Math.PI * 2); ectx.fill();
+
+          const a1 = Math.atan2(p1[1] - cy, p1[0] - cx);
+          let a2 = Math.atan2(p2[1] - cy, p2[0] - cx);
+          let da = a2 - a1;
+          while (da > Math.PI) da -= Math.PI * 2;
+          while (da < -Math.PI) da += Math.PI * 2;
+          for (let i = 1; i < 4; i++) {
+            const tt = i / 4;
+            const ang = a1 + da * tt + Math.sin(t / 300 + i) * 0.01;
+            const bx = cx + Math.cos(ang) * sunR;
+            const by = cy + Math.sin(ang) * sunR;
+            const br = (1.2 + i % 2) * (0.8 + closeness * 1.6);
+            const bg = ectx.createRadialGradient(bx, by, 0, bx, by, br * 3.2);
+            bg.addColorStop(0, `rgba(255,255,255,${0.8 * closeness})`);
+            bg.addColorStop(1, 'rgba(255,255,255,0)');
+            ectx.fillStyle = bg;
+            ectx.beginPath(); ectx.arc(bx, by, br * 3.2, 0, Math.PI * 2); ectx.fill();
+          }
+        }
+      }
+    }
+
+    function eclipseLoop(t) {
+      drawEclipse(t || 0);
+      requestAnimationFrame(eclipseLoop);
+    }
+    requestAnimationFrame(eclipseLoop);
+    eclipseSlider.addEventListener('input', () => drawEclipse(performance.now()));
+
+
+    // ================= LUNA LLENA TEXTURIZADA (canvas, misma técnica que el eclipse) =================
+    const moonCanvas = document.getElementById('moonCanvas');
+    const mctx = moonCanvas.getContext('2d');
+    const mSize = moonCanvas.width;          // 420 (lienzo interno, se escala por CSS)
+    const mC = mSize / 2, mR = mSize / 2 - 4;
+
+    function drawFullMoon(t) {
+      if (!document.getElementById('elem-moon').classList.contains('active')) return;
+      mctx.clearRect(0, 0, mSize, mSize);
+
+      // base blanca luminosa (luna llena, iluminada de frente)
+      mctx.save();
+      mctx.beginPath(); mctx.arc(mC, mC, mR, 0, Math.PI * 2); mctx.clip();
+      const base = mctx.createRadialGradient(mC - mR * 0.15, mC - mR * 0.18, mR * 0.1, mC, mC, mR);
+      base.addColorStop(0, '#ffffff');
+      base.addColorStop(0.5, '#f4f2ee');
+      base.addColorStop(0.85, '#dcd9d6');
+      base.addColorStop(1, '#b9b6b6');
+      mctx.fillStyle = base;
+      mctx.fillRect(0, 0, mSize, mSize);
+      mctx.restore();
+
+      // textura lunar (mares, cráteres, relieve) con proyección esférica y rotación muy lenta
+      // se dibuja en modo "multiply" para que oscurezca los detalles sin quitar el blanco de base
+      mctx.save();
+      mctx.globalCompositeOperation = 'multiply';
+      drawTexturedSphere(mctx, moonTexture, mC, mC, mR, t * 0.000006, 0.85);
+      mctx.restore();
+
+      // aclarado general: mantiene la luna blanca aunque la textura sea gris
+      mctx.save();
+      mctx.beginPath(); mctx.arc(mC, mC, mR, 0, Math.PI * 2); mctx.clip();
+      mctx.globalCompositeOperation = 'screen';
+      mctx.fillStyle = 'rgba(255,255,255,0.28)';
+      mctx.fillRect(0, 0, mSize, mSize);
+      mctx.restore();
+
+      // oscurecimiento sutil de limbo (borde curvo -> volumen 3D real)
+      mctx.save();
+      mctx.beginPath(); mctx.arc(mC, mC, mR, 0, Math.PI * 2); mctx.clip();
+      const mlimb = mctx.createRadialGradient(mC, mC, mR * 0.62, mC, mC, mR);
+      mlimb.addColorStop(0, 'rgba(40,40,55,0)');
+      mlimb.addColorStop(0.8, 'rgba(40,40,55,0.14)');
+      mlimb.addColorStop(1, 'rgba(30,30,45,0.42)');
+      mctx.fillStyle = mlimb;
+      mctx.fillRect(0, 0, mSize, mSize);
+      // leve realce de luz arriba-izquierda (coherente con el relieve de los cráteres)
+      const mhi = mctx.createRadialGradient(mC - mR * 0.3, mC - mR * 0.35, 0, mC - mR * 0.3, mC - mR * 0.35, mR * 1.1);
+      mhi.addColorStop(0, 'rgba(255,255,255,0.14)');
+      mhi.addColorStop(0.5, 'rgba(255,255,255,0.04)');
+      mhi.addColorStop(1, 'rgba(255,255,255,0)');
+      mctx.fillStyle = mhi;
+      mctx.fillRect(0, 0, mSize, mSize);
+      mctx.restore();
+    }
+
+    function moonLoop(t) {
+      drawFullMoon(t || 0);
+      requestAnimationFrame(moonLoop);
+    }
+    requestAnimationFrame(moonLoop);
+
+    // ================= AURORA BOREAL (canvas: cortinas de luz orgánicas) =================
+    const auroraCanvas = document.getElementById('auroraCanvas');
+    const actx = auroraCanvas.getContext('2d');
+    let aDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    let aW = 0, aH = 0;
+    function resizeAuroraCanvas() {
+      aDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      aW = window.innerWidth; aH = window.innerHeight;
+      auroraCanvas.width = aW * aDPR;
+      auroraCanvas.height = aH * aDPR;
+      auroraCanvas.style.width = aW + 'px';
+      auroraCanvas.style.height = aH + 'px';
+      actx.setTransform(aDPR, 0, 0, aDPR, 0, 0);
+    }
+    window.addEventListener('resize', resizeAuroraCanvas);
+
+    // Tres cortinas superpuestas: verde principal, verde-azulado, y violeta/rosa en el borde superior
+    const AURORA_BANDS = [
+      { color: [70, 255, 160], baseY: 0.30, amp: 0.055, freq: 5.2, speed: 0.00016, speed2: 0.00009, thickness: 0.20, peakA: 0.62, phase: 0.0 },
+      { color: [40, 225, 215], baseY: 0.20, amp: 0.045, freq: 4.1, speed: 0.00012, speed2: 0.00007, thickness: 0.15, peakA: 0.42, phase: 2.4 },
+      { color: [175, 110, 255], baseY: 0.14, amp: 0.04, freq: 3.4, speed: 0.00021, speed2: 0.00011, thickness: 0.10, peakA: 0.30, phase: 5.1 }
+    ];
+
+    function auroraCurtainPath(band, t, w, h) {
+      const N = 22;
+      const top = [];
+      for (let i = 0; i <= N; i++) {
+        const nx = i / N;
+        const wobble = Math.sin(nx * band.freq + t * band.speed + band.phase) * band.amp
+          + Math.sin(nx * 2.1 - t * band.speed2 + band.phase * 1.6) * band.amp * 0.55
+          + Math.sin(nx * 8.3 + t * band.speed * 1.7 + band.phase) * band.amp * 0.12;
+        top.push([nx * w, (band.baseY + wobble) * h]);
+      }
+      actx.beginPath();
+      actx.moveTo(top[0][0], top[0][1]);
+      for (let i = 1; i < top.length; i++) {
+        const prev = top[i - 1], cur = top[i];
+        const mx = (prev[0] + cur[0]) / 2, my = (prev[1] + cur[1]) / 2;
+        actx.quadraticCurveTo(prev[0], prev[1], mx, my);
+      }
+      actx.lineTo(top[top.length - 1][0], top[top.length - 1][1]);
+      for (let i = top.length - 1; i >= 0; i--) {
+        const nx = i / N;
+        const foldY = top[i][1] + band.thickness * h * (0.75 + 0.35 * Math.sin(nx * 9 + t * band.speed * 2.3 + band.phase * 2));
+        actx.lineTo(top[i][0], foldY);
+      }
+      actx.closePath();
+      return top;
+    }
+
+    function drawAuroraBand(band, t, w, h) {
+      const top = auroraCurtainPath(band, t, w, h);
+      const [r, g, b] = band.color;
+      const shimmer = 0.82 + 0.18 * Math.sin(t * 0.0006 + band.phase);
+      const grad = actx.createLinearGradient(0, band.baseY * h, 0, (band.baseY + band.thickness) * h);
+      grad.addColorStop(0, `rgba(${r},${g},${b},0.02)`);
+      grad.addColorStop(0.35, `rgba(${r},${g},${b},${band.peakA * shimmer})`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      actx.fillStyle = grad;
+      actx.fill();
+
+      // estrías verticales (textura de "cortina" plegada), recortadas a la forma de la banda
+      actx.save();
+      actx.clip();
+      const stripes = 26;
+      for (let i = 0; i < stripes; i++) {
+        const nx = i / stripes;
+        const x = nx * w;
+        const flick = 0.3 + 0.7 * Math.abs(Math.sin(nx * 14 + t * 0.0004 + band.phase * 3));
+        const sw = w / stripes * 1.4;
+        const sg = actx.createLinearGradient(x, band.baseY * h, x, (band.baseY + band.thickness) * h);
+        sg.addColorStop(0, `rgba(${Math.min(255, r + 60)},${Math.min(255, g + 40)},${Math.min(255, b + 40)},0)`);
+        sg.addColorStop(0.45, `rgba(${Math.min(255, r + 60)},${Math.min(255, g + 40)},${Math.min(255, b + 40)},${0.16 * flick})`);
+        sg.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        actx.fillStyle = sg;
+        actx.fillRect(x - sw / 2, band.baseY * h, sw, band.thickness * h * 1.6);
+      }
+      actx.restore();
+
+      // línea de brillo más intensa justo en el borde inferior visible de la cortina (base luminosa)
+      actx.save();
+      actx.beginPath();
+      actx.moveTo(top[0][0], top[0][1]);
+      for (let i = 1; i < top.length; i++) {
+        const prev = top[i - 1], cur = top[i];
+        const mx = (prev[0] + cur[0]) / 2, my = (prev[1] + cur[1]) / 2;
+        actx.quadraticCurveTo(prev[0], prev[1], mx, my);
+      }
+      actx.strokeStyle = `rgba(${Math.min(255, r + 70)},${Math.min(255, g + 60)},${Math.min(255, b + 50)},${0.5 * shimmer})`;
+      actx.lineWidth = Math.max(1, h * 0.003);
+      actx.filter = 'blur(1.5px)';
+      actx.stroke();
+      actx.filter = 'none';
+      actx.restore();
+    }
+
+    function drawAurora(t) {
+      const el = document.getElementById('elem-aurora');
+      if (!el || !el.classList.contains('active')) {
+        if (aW) actx.clearRect(0, 0, aW, aH);
+        return;
+      }
+      if (!aW) resizeAuroraCanvas();
+      actx.clearRect(0, 0, aW, aH);
+
+      actx.save();
+      actx.globalCompositeOperation = 'lighter';
+      // dibuja de la más lejana/tenue a la más cercana/brillante
+      for (let i = AURORA_BANDS.length - 1; i >= 0; i--) {
+        drawAuroraBand(AURORA_BANDS[i], t, aW, aH);
+      }
+      actx.restore();
+    }
+
+    function auroraLoop(t) {
+      drawAurora(t || 0);
+      requestAnimationFrame(auroraLoop);
+    }
+    requestAnimationFrame(auroraLoop);
+
+    // ================= ATARDECER: DÍA A NOCHE (sol texturizado en canvas) =================
+    const sunSlider = document.getElementById('sunSlider');
+    const sunStars = document.getElementById('sunStars');
+    const sunsetCanvas = document.getElementById('sunsetCanvas');
+    const sctx2 = sunsetCanvas.getContext('2d');
+    let ssDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    let ssW = 0, ssH = 0;
+    function resizeSunsetCanvas() {
+      ssDPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+      ssW = window.innerWidth; ssH = window.innerHeight;
+      sunsetCanvas.width = ssW * ssDPR;
+      sunsetCanvas.height = ssH * ssDPR;
+      sunsetCanvas.style.width = ssW + 'px';
+      sunsetCanvas.style.height = ssH + 'px';
+      sctx2.setTransform(ssDPR, 0, 0, ssDPR, 0, 0);
+    }
+    window.addEventListener('resize', resizeSunsetCanvas);
+
+    const skyStops = [
+      { p: 0, c: ['#3a6bb8', '#7fa8d9', '#dba46e', '#e8c496', '#274063'] },
+      { p: 50, c: ['#1c0f3d', '#59204f', '#a5354a', '#d97a4e', '#4a1c2e'] },
+      { p: 100, c: ['#03040c', '#0a0512', '#160816', '#1c0a10', '#020103'] }
+    ];
+    function hexToRgb(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+    function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+    function mixColors(c1, c2, t) {
+      const a = hexToRgb(c1), b = hexToRgb(c2);
+      return `rgb(${lerp(a[0], b[0], t)}, ${lerp(a[1], b[1], t)}, ${lerp(a[2], b[2], t)})`;
+    }
+    function updateSun() {
+      const v = parseFloat(sunSlider.value); // 0 día, 50 atardecer, 100 noche
+      const stop = v <= 50 ? [skyStops[0], skyStops[1], (v / 50)] : [skyStops[1], skyStops[2], (v - 50) / 50];
+      const [from, to, t] = stop;
+      const colors = from.c.map((c, i) => mixColors(c, to.c[i], t));
+      if (document.body.classList.contains('bg-sun')) {
+        document.body.style.background = `linear-gradient(180deg, ${colors[0]} 0%, ${colors[1]} 30%, ${colors[2]} 55%, ${colors[3]} 78%, ${colors[4]} 100%)`;
+      }
+      // aparecen estrellas de noche
+      sunStars.style.opacity = `${Math.max(0, (v - 55) / 45).toFixed(2)}`;
+    }
+    sunSlider.addEventListener('input', updateSun);
+
+    function drawSunset(t) {
+      const elemSun = document.getElementById('elem-sun');
+      if (!elemSun || !elemSun.classList.contains('active')) return;
+      if (!ssW) resizeSunsetCanvas();
+      sctx2.clearRect(0, 0, ssW, ssH);
+
+      const v = parseFloat(sunSlider.value);
+      const camX = curX * 8, camY = curY * 5;
+      const cx = ssW / 2 + camX;
+      const cy = ssH * (0.30 + v * 0.0058) + camY; // recorrido más amplio: pasa detrás de las 3 capas de montañas
+      const R = Math.max(50, Math.min(ssW, ssH) * 0.105);
+      const strength = Math.max(0.18, 1 - v / 130); // brilla menos al acercarse a la noche
+
+      // halo atmosférico (glow cálido detrás del disco)
+      const halo = sctx2.createRadialGradient(cx, cy, R * 0.6, cx, cy, R * 3.3);
+      halo.addColorStop(0, `rgba(255,210,140,${0.55 * strength})`);
+      halo.addColorStop(0.4, `rgba(255,150,80,${0.28 * strength})`);
+      halo.addColorStop(1, 'rgba(255,120,60,0)');
+      sctx2.fillStyle = halo;
+      sctx2.beginPath(); sctx2.arc(cx, cy, R * 3.3, 0, Math.PI * 2); sctx2.fill();
+
+      // disco solar con granulación real (misma textura que el eclipse)
+      sctx2.save();
+      sctx2.beginPath(); sctx2.arc(cx, cy, R, 0, Math.PI * 2); sctx2.clip();
+      const base = sctx2.createRadialGradient(cx, cy, 0, cx, cy, R);
+      base.addColorStop(0, '#fffdf2');
+      base.addColorStop(0.55, '#ffdf9a');
+      base.addColorStop(0.85, '#ff9a4d');
+      base.addColorStop(1, '#e14a2e');
+      sctx2.fillStyle = base;
+      sctx2.fillRect(cx - R, cy - R, R * 2, R * 2);
+      sctx2.restore();
+
+      drawTexturedSphere(sctx2, sunTexture, cx, cy, R, t * 0.00004, 0.5);
+
+      // tiñe la textura con los tonos cálidos del atardecer y oscurece el limbo
+      sctx2.save();
+      sctx2.beginPath(); sctx2.arc(cx, cy, R, 0, Math.PI * 2); sctx2.clip();
+      const warmTint = sctx2.createRadialGradient(cx, cy, 0, cx, cy, R);
+      warmTint.addColorStop(0, 'rgba(255,140,60,0.05)');
+      warmTint.addColorStop(0.7, 'rgba(255,90,40,0.16)');
+      warmTint.addColorStop(1, `rgba(200,40,20,${0.4 + v * 0.003})`);
+      sctx2.fillStyle = warmTint;
+      sctx2.fillRect(cx - R, cy - R, R * 2, R * 2);
+      sctx2.restore();
+    }
+
+    function sunsetLoop(t) {
+      drawSunset(t || 0);
+      requestAnimationFrame(sunsetLoop);
+    }
+    requestAnimationFrame(sunsetLoop);
+
+    // FLOR
     const flower = document.getElementById('flower');
     const card = document.getElementById('card');
     const instruction = document.getElementById('instruction');
@@ -376,6 +2122,11 @@
       flower.classList.add('bloomed');
       instruction.style.opacity = '0';
       card.classList.add('show');
+    });
+
+    // Estado inicial de la escena por defecto
+    window.addEventListener('load', () => {
+      setTimeout(() => flashHint('🖱️ Mové el mouse (o el dedo) para mirar alrededor'), 800);
     });
   </script>
 </body>
