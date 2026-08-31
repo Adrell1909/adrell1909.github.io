@@ -855,6 +855,20 @@
       font-family: 'Cormorant Garamond', serif;
     }
 
+    .letter-card.long-letter {
+      text-align: left;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .letter-card.long-letter p {
+      margin-bottom: 18px;
+    }
+
+    .letter-card.long-letter p:last-child {
+      margin-bottom: 0;
+    }
+
     .world-info-card {
       position: fixed;
       bottom: 26px;
@@ -898,6 +912,168 @@
         height: 260px;
       }
     }
+
+    /* ================= BÓVEDA (acceso privado) ================= */
+    .vault-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(3, 2, 5, 0.78);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s ease;
+    }
+
+    .vault-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .vault-card {
+      position: relative;
+      width: min(92vw, 380px);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(18px);
+      border-radius: 18px;
+      padding: 34px 30px 28px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .6), 0 0 30px rgba(230, 35, 53, .18);
+      transform: translateY(14px) scale(.97);
+      transition: transform .35s ease;
+    }
+
+    .vault-overlay.show .vault-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .vault-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .15);
+      background: rgba(255, 255, 255, .04);
+      color: var(--text-muted);
+      font-size: .85rem;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .vault-close:hover {
+      background: rgba(230, 35, 53, .25);
+      color: #fff;
+      border-color: var(--crimson-bright);
+    }
+
+    .vault-card h2 {
+      color: var(--crimson-bright);
+      font-size: 1.7rem;
+      margin: 4px 0 10px;
+    }
+
+    .vault-sub {
+      color: var(--text-muted);
+      font-size: .88rem;
+      line-height: 1.5;
+      margin-bottom: 22px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+    }
+
+    .vault-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .vault-form label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-top: 10px;
+    }
+
+    .vault-form input {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text-main);
+      font-family: 'Poppins', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .25s, box-shadow .25s;
+    }
+
+    .vault-form input:focus {
+      border-color: var(--crimson-bright);
+      box-shadow: 0 0 0 3px rgba(230, 35, 53, .18);
+    }
+
+    .vault-form input.vault-input-error {
+      border-color: var(--crimson);
+      animation: vaultShake .35s ease;
+    }
+
+    @keyframes vaultShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-6px);
+      }
+
+      75% {
+        transform: translateX(6px);
+      }
+    }
+
+    .vault-submit {
+      margin-top: 20px;
+      background: linear-gradient(135deg, var(--crimson-deep), var(--crimson-bright));
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      font-size: .92rem;
+      letter-spacing: .5px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .vault-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(230, 35, 53, .4);
+    }
+
+    .vault-hint {
+      margin-top: 16px;
+      font-size: .82rem;
+      color: var(--gold);
+      line-height: 1.5;
+      min-height: 1.2em;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+
+    .vault-hint.show {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -910,6 +1086,7 @@
       <h3>Secciones</h3>
       <button class="nav-btn active" onclick="switchSection('cards')">🌹 Carta y Flor</button>
       <button class="nav-btn" onclick="switchSection('world')">🌌 Mundo</button>
+      <button class="nav-btn" onclick="openVault()">🔒 Bóveda</button>
     </div>
 
     <div class="nav-section" id="worldOptionsSection">
@@ -1137,6 +1314,78 @@
     </div>
   </div>
 
+  <!-- VISTA 3: BÓVEDA (contenido privado, solo visible tras ingresar las credenciales) -->
+  <div class="view-panel" id="panel-vault">
+    <div class="container" style="max-width:700px;">
+      <p class="eyebrow">Acceso privado</p>
+      <h2 style="color:var(--crimson-bright); font-size:1.8rem; margin-bottom:16px;">La Bóveda</h2>
+      <div class="letter-card long-letter show" style="margin-top:0;">
+        <p>Armo este mensaje para poder expresar lo que me pasa, en el caso de que el constante caos me haga olvidar.
+          Este mensaje no será enviado, pero sí guardado, en un lugar donde vas a poder acceder y donde voy a guardar
+          cada mensaje que no pueda comunicarte, porque sé que no vas a querer leerlo ni responderlo.</p>
+        <p>Este dolor que me consume por dentro lo generé yo, y ya lo sabés; conocés esa parte de la historia, pero no
+          conocés la historia completa. ¿Cómo pasó? Tu espacio me invadió de dudas y miedos, eso me llevó a querer
+          investigar, y encontré que Benja sigue queriendo acceder a vos, si es que no lo hace ya. No sé si se siguen
+          hablando, no sé si lo desbloqueaste; solo sé que, por ese chico y por mi insistencia, fuiste acorralada al
+          punto de tomar la decisión que tomaste. Ese chico me da miedo, porque fue más difícil para vos eliminarlo a
+          él, mientras que fue tan sencillo eliminarme a mí. Eso me deja pensando, me llena de preguntas y de miedos.
+          ¿Por qué me eliminaste de todos lados menos de Discord, la plataforma que menos usás? ¿Querés distancia? Yo
+          quiero saber de vos, quiero conocerte, pero mis miedos te obligaron a alejarte de mí, aunque lo niegues con
+          insistencia. ¿Hay algo que me ocultás y no me querés decir? ¿Hay algo que no querés que vea? ¿Por qué? ¿Para
+          protegerme? ¿Será pena? No sé, pero que no quieras responderme mis dudas, que no quieras que te las
+          pregunte... eso me desgarra. Es duro soportar que la mujer que amás se defienda de vos, se cierre con vos, y
+          no puedas saber nada ni interactuar de ninguna manera.</p>
+        <p>Yo no puedo soportar esta dinámica: que me llames amigo, pero me alejes de todo como si fuera un desconocido.
+          Creo que no me considerás un amigo, o que sentís menos de lo que sentías, pero por pena, o por algún miedo, te
+          impide sacarme de tu vida por completo. No es tu paciencia, porque la desgasté; ya no tenés paciencia conmigo,
+          por algo me eliminaste. Decís que me metí a ver tus cosas, pero lo miré a él y no a vos. ¿Significa que siguen
+          en contacto? Es doloroso. Mi corazón siente traición, dolor, angustia, miedo, inseguridad; necesito
+          respuestas, pero no puedo preguntarte porque ya no confiás en mí, ya no creo que me consideres un amigo de
+          verdad.</p>
+        <p>Tu ausencia, tu distancia, tu frialdad, le dan la libertad a mi cerebro de sobrepensar, de ser inseguro, de
+          aterrorizarme, de culparme, de odiarme por todo lo que te hice. Necesito explicaciones, pero no por ser un
+          niño, sino para que mi cerebro pueda entender lo que realmente ocurre. Pero no vas a poder contarme nada, no
+          lo vas a hacer, y anhelo darte paz, aunque eso signifique seguir dañándome en secreto. No te oculto cómo me
+          siento, porque realmente quiero que veas cómo estoy; quiero serte sincero hasta el final, porque mi corazón es
+          incapaz de mentirte. Te amo de verdad, y eso significa que ni siquiera el propio caos que generé me va a hacer
+          dudar ni me va a hacer huir; solo aguantar. Sé que es amor y no otro tipo de emoción enfermiza, porque a pesar
+          de todo sigo preocupándome por vos y sigo prefiriendo tu bienestar antes que mi propio beneficio. No insisto
+          en arreglar nada; sé que no se va a arreglar nada con mi insistencia. Cerraste la puerta, y no importa cuántas
+          veces golpee, jamás la vas a abrir para mí de nuevo.</p>
+        <p>Hundido en un pozo cavado por mí, pero sin poder reclamarte nada —no porque no pueda, realmente puedo
+          hacerlo; si fuera un egoísta lo haría, si fuera un ignorante lo haría—. Sin embargo, amarte significa darme
+          cuenta de que resolver esto no es lo que vos querés. Por eso jamás insistí, y dejé el problema en el aire, sin
+          resolver, aunque siempre diga que lo resolvamos. Dijiste que íbamos a sanar juntos, pero en su lugar me
+          dejaste una herida sin tratar, esperando que la cure solo. Porque nunca te voy a pedir que me sanes: no es tu
+          responsabilidad cuidar mi corazón, no es tu trabajo cuidar a la persona que más daño te hizo. Siempre me
+          comparé, y lo sigo haciendo: siento que él, a pesar de nunca dejarte en paz, hubiera sido mejor compañero y
+          amigo de lo que yo fui. Te fallé, y me odio a mí mismo por eso. Me impido ser feliz porque lastimé a la
+          persona que amo, y eso significa que debo cargar con la culpa toda mi vida.</p>
+        <p>Hay días en los que este dolor pesa tanto que solo quiero acabar conmigo, darte paz con mi ausencia. Una de
+          las cosas que más me reconforta pensar es en el día en que vuelvas a rodearte de amistades, en que tengas
+          gente cerca que te cuide como yo, por mis propios errores, no supe hacerlo.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay de credenciales para entrar a la Bóveda -->
+  <div class="vault-overlay" id="vaultOverlay">
+    <div class="vault-card">
+      <button class="vault-close" id="vaultClose" aria-label="Cerrar" type="button">✕</button>
+      <p class="eyebrow">Acceso privado</p>
+      <h2>Bóveda</h2>
+      <p class="vault-sub">Ingresá las credenciales para abrir este espacio.</p>
+      <form id="vaultForm" class="vault-form" autocomplete="off">
+        <label for="vaultName">Nombre</label>
+        <input type="text" id="vaultName" autocomplete="off" placeholder="¿Quién sos?">
+        <label for="vaultDate">Fecha (DD/MM)</label>
+        <input type="text" id="vaultDate" autocomplete="off" placeholder="DD/MM" inputmode="numeric">
+        <button type="submit" class="vault-submit">Abrir</button>
+      </form>
+      <p class="vault-hint" id="vaultHint"></p>
+    </div>
+  </div>
+
   <script>
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
@@ -1149,6 +1398,81 @@
       event.currentTarget.classList.add('active');
       sidebar.classList.remove('open');
     }
+
+    // ================= BÓVEDA (acceso privado con credenciales) =================
+    const VAULT_NAME = 'saskya';
+    const VAULT_DATE = '2811'; // 28/11, en formato DDMM
+    let vaultUnlocked = false;
+
+    const vaultOverlay = document.getElementById('vaultOverlay');
+    const vaultForm = document.getElementById('vaultForm');
+    const vaultNameInput = document.getElementById('vaultName');
+    const vaultDateInput = document.getElementById('vaultDate');
+    const vaultHint = document.getElementById('vaultHint');
+    const vaultClose = document.getElementById('vaultClose');
+
+    function normalizeVaultDate(str) {
+      const digits = (str || '').replace(/\D/g, '');
+      if (digits.length === 4) return digits; // ya viene como DDMM
+      const match = (str || '').match(/(\d{1,2})\D+(\d{1,2})/);
+      if (match) return match[1].padStart(2, '0') + match[2].padStart(2, '0');
+      return digits;
+    }
+
+    function showVaultPanel() {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-panel'));
+      document.getElementById('panel-vault').classList.add('active-panel');
+      const sectionBtns = document.querySelectorAll('.nav-section')[0].querySelectorAll('.nav-btn');
+      sectionBtns.forEach(b => b.classList.remove('active'));
+      sectionBtns[2].classList.add('active'); // botón "🔒 Bóveda"
+      sidebar.classList.remove('open');
+    }
+
+    function openVault() {
+      sidebar.classList.remove('open');
+      if (vaultUnlocked) {
+        showVaultPanel();
+        return;
+      }
+      vaultHint.classList.remove('show');
+      vaultHint.textContent = '';
+      vaultOverlay.classList.add('show');
+      setTimeout(() => vaultNameInput.focus(), 350);
+    }
+
+    function closeVaultOverlay() {
+      vaultOverlay.classList.remove('show');
+    }
+
+    vaultClose.addEventListener('click', closeVaultOverlay);
+    vaultOverlay.addEventListener('click', (e) => {
+      if (e.target === vaultOverlay) closeVaultOverlay();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && vaultOverlay.classList.contains('show')) closeVaultOverlay();
+    });
+
+    vaultForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nameOk = vaultNameInput.value.trim().toLowerCase() === VAULT_NAME;
+      const dateOk = normalizeVaultDate(vaultDateInput.value) === VAULT_DATE;
+
+      [vaultNameInput, vaultDateInput].forEach(el => el.classList.remove('vault-input-error'));
+
+      if (nameOk && dateOk) {
+        vaultUnlocked = true;
+        closeVaultOverlay();
+        showVaultPanel();
+        vaultForm.reset();
+        vaultHint.classList.remove('show');
+        return;
+      }
+
+      if (!nameOk) vaultNameInput.classList.add('vault-input-error');
+      if (!dateOk) vaultDateInput.classList.add('vault-input-error');
+      vaultHint.textContent = '💡 Pista: el nombre es "Saskya" y la fecha es 28/11.';
+      vaultHint.classList.add('show');
+    });
 
     const worldsInfo = {
       stars: { title: "Cielo Estrellado", desc: "Un manto infinito de estrellas titilantes, atravesado de vez en cuando por una estrella fugaz.", bg: "bg-stars" },
