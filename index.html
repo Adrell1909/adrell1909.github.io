@@ -1599,7 +1599,7 @@
     }
 
     // ================= BÓVEDA (acceso privado con credenciales) =================
-    const VAULT_NAME = 'saskya';
+    const VAULT_NAMES = ['saskya']; // se pueden agregar más nombres si querés
     const VAULT_DATE = '2811'; // 28/11, en formato DDMM
     let vaultUnlocked = false;
 
@@ -1654,7 +1654,7 @@
 
     vaultForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const nameOk = vaultNameInput.value.trim().toLowerCase() === VAULT_NAME;
+      const nameOk = VAULT_NAMES.includes(vaultNameInput.value.trim().toLowerCase());
       const dateOk = normalizeVaultDate(vaultDateInput.value) === VAULT_DATE;
 
       [vaultNameInput, vaultDateInput].forEach(el => el.classList.remove('vault-input-error'));
