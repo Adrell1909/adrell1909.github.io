@@ -1074,6 +1074,229 @@
     .vault-hint.show {
       opacity: 1;
     }
+
+    /* ================= GALERÍA (dentro de la Bóveda) ================= */
+    .gallery-picker {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 32px 28px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .gallery-picker-text {
+      color: var(--text-muted);
+      font-size: .95rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+    }
+
+    .gallery-picker-note {
+      color: var(--text-muted);
+      font-size: .76rem;
+      line-height: 1.5;
+      margin-top: 16px;
+      opacity: .75;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .gallery-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+
+    .gallery-tab {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .12);
+      color: #e3dbdd;
+      padding: 9px 18px;
+      border-radius: 24px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all .25s;
+    }
+
+    .gallery-tab:hover,
+    .gallery-tab.active {
+      background: rgba(230, 35, 53, .22);
+      border-color: var(--crimson-bright);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(230, 35, 53, .3);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, .08);
+      transition: transform .25s, box-shadow .25s;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.035);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, .5), 0 0 18px rgba(230, 35, 53, .3);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-empty {
+      color: var(--text-muted);
+      font-size: .9rem;
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+    }
+
+    .gallery-songs {
+      margin-top: 30px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .gallery-songs h3 {
+      color: var(--crimson-bright);
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .song-embeds {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .song-embed iframe {
+      border-radius: 12px;
+      display: block;
+    }
+
+    /* ================= LIGHTBOX ================= */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 1, 4, .92);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+      padding: 60px 20px;
+    }
+
+    .lightbox.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .2);
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(230, 35, 53, .3);
+      border-color: var(--crimson-bright);
+    }
+
+    .lightbox-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .2);
+      background: rgba(255, 255, 255, .06);
+      color: #fff;
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .lightbox-nav:hover {
+      background: rgba(230, 35, 53, .3);
+      border-color: var(--crimson-bright);
+    }
+
+    .lightbox-prev {
+      left: 18px;
+    }
+
+    .lightbox-next {
+      right: 18px;
+    }
+
+    @media (max-width:600px) {
+      .lightbox-nav {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
+      }
+
+      .gallery-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+
+      .gallery-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .gallery-tab {
+        flex: 0 0 auto;
+      }
+    }
   </style>
 </head>
 
@@ -1316,18 +1539,32 @@
 
   <!-- VISTA 3: BÓVEDA (contenido privado, solo visible tras ingresar las credenciales) -->
   <div class="view-panel" id="panel-vault">
-    <div class="container" style="max-width:700px;">
+    <div class="container" style="max-width:980px;">
       <p class="eyebrow">Acceso privado</p>
-      <h2 style="color:var(--crimson-bright); font-size:1.8rem; margin-bottom:16px;">La Bóveda</h2>
-      <div class="letter-card long-letter show" style="margin-top:0;">
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
-        <p></p>
+      <h2 style="color:var(--crimson-bright); font-size:1.8rem; margin-bottom:6px;">La Bóveda</h2>
+      <p class="vault-sub" style="margin-bottom:26px;">Galería</p>
+
+      <div class="gallery-picker" id="galleryPicker">
+        <p class="gallery-picker-text" id="galleryPickerText">Cargando galería...</p>
+        <p class="gallery-picker-note" id="galleryPickerNote">La galería se organiza sola a partir de la carpeta "galeria" del repositorio: cada subcarpeta adentro es una categoría nueva.</p>
+      </div>
+
+      <div class="gallery-tabs" id="galleryTabs"></div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <p class="gallery-empty" id="galleryEmpty" style="display:none;">Esta categoría todavía no tiene fotos.</p>
+
+      <div class="gallery-songs" id="gallerySongs" style="display:none;">
+        <h3>🎵 Canciones</h3>
+        <div class="song-embeds" id="songEmbeds"></div>
       </div>
     </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Cerrar">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Anterior">‹</button>
+    <img id="lightboxImg" src="" alt="">
+    <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button" aria-label="Siguiente">›</button>
   </div>
 
   <!-- Overlay de credenciales para entrar a la Bóveda -->
@@ -1388,6 +1625,7 @@
       sectionBtns.forEach(b => b.classList.remove('active'));
       sectionBtns[2].classList.add('active'); // botón "🔒 Bóveda"
       sidebar.classList.remove('open');
+      loadGalleryFromFolder();
     }
 
     function openVault() {
@@ -1435,6 +1673,276 @@
       vaultHint.textContent = '💡 Pista: el nombre es "Saskya" y la fecha es 28/11.';
       vaultHint.classList.add('show');
     });
+
+        // ================= GALERÍA =================
+    // Cómo agregar fotos:
+    // 1) En el repositorio de GitHub, creá la carpeta "Galeria" al lado de index.html.
+    // 2) Dentro de "Galeria", una subcarpeta por categoría: "Especial", "Minecraft", etc.
+    // 3) Subí las imágenes a cada subcarpeta y hacé commit. Listo.
+    //
+    // Para probar en tu computadora (sin subir a GitHub):
+    //   - Usá un servidor local: python -m http.server  →  http://localhost:8000
+    //   - O la extensión "Live Server" de VS Code.
+    //
+    // El código detecta automáticamente si está en GitHub Pages y usa la API de GitHub
+    // para leer las carpetas. En local sigue usando el listado del servidor.
+    const GALLERY_FOLDER = 'Galeria'; // <-- nombre exacto de la carpeta, tal cual aparece al lado del HTML
+
+    const galleryPicker = document.getElementById('galleryPicker');
+    const galleryPickerText = document.getElementById('galleryPickerText');
+    const galleryPickerNote = document.getElementById('galleryPickerNote');
+    const galleryTabs = document.getElementById('galleryTabs');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryEmpty = document.getElementById('galleryEmpty');
+
+    const IMAGE_EXT = /\.(jpe?g|png|gif|webp|avif|bmp)$/i;
+    const CATEGORY_ICONS = { minecraft: '⛏️', roblox: '🎮', especial: '💌', otro: '💌', otros: '💌' };
+
+    let galleryData = {};     // { "Minecraft": [{url, name}], "Roblox": [...], ... }
+    let currentCategory = null;
+    let galleryLoaded = false;
+    let galleryLoading = false;
+
+    // Lee el listado de archivos/carpetas que devuelve el servidor local para una URL de carpeta
+    // (funciona con el listado automático que generan python -m http.server, Live Server, Apache, etc.)
+        async function fetchDirListing(url) {
+      // 1) Intentar con la API de GitHub (solo si estamos en GitHub Pages)
+      const apiUrl = toGitHubApiUrl(url);
+      if (apiUrl) {
+        try {
+          const res = await fetch(apiUrl);
+          if (res.ok) {
+            const json = await res.json();
+            if (Array.isArray(json)) {
+              // La API devuelve objetos; convertimos a strings como espera el resto del código
+              return json.map(item => item.type === 'dir' ? item.name + '/' : item.name);
+            }
+          }
+        } catch (e) {
+          // Si la API falla, seguimos con el método local como fallback
+        }
+      }
+
+      // 2) Fallback: listado de directorio local (python -m http.server, Live Server, etc.)
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('No se pudo leer ' + url);
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      return Array.from(doc.querySelectorAll('a'))
+        .map(a => a.getAttribute('href'))
+        .filter(href =>
+          href &&
+          href !== '../' && href !== '/' && href !== './' &&
+          !href.startsWith('http') && !href.startsWith('?') && !href.startsWith('#')
+        );
+    }
+
+    // Helper: convierte ./Galeria/Especial/ en la URL de la API de GitHub
+    function toGitHubApiUrl(localUrl) {
+      const isGitHubPages = location.hostname.endsWith('.github.io');
+      if (!isGitHubPages) return null;
+
+      const match = localUrl.match(/\.\/([^?#]+)/);
+      if (!match) return null;
+
+      const path = match[1].replace(/\/$/, '');
+      return `https://api.github.com/repos/Adrell1909/adrell1909.github.io/contents/${path}?ref=main`;
+    }
+
+    async function loadGalleryFromFolder() {
+      if (galleryLoaded || galleryLoading) return;
+      galleryLoading = true;
+      galleryPicker.style.display = 'block';
+      galleryPickerText.textContent = 'Cargando galería...';
+
+      try {
+        const rootUrl = `./${GALLERY_FOLDER}/`;
+        const rootEntries = await fetchDirListing(rootUrl);
+        const folderHrefs = rootEntries.filter(e => e.endsWith('/'));
+
+        const data = {};
+        for (const rawHref of folderHrefs) {
+          const label = decodeURIComponent(rawHref.replace(/\/$/, ''));
+          const subUrl = rootUrl + rawHref;
+          let files;
+          try { files = await fetchDirListing(subUrl); } catch (e) { continue; }
+          const images = files.filter(f => IMAGE_EXT.test(f) && !f.endsWith('/'));
+          if (!images.length) continue;
+          data[label] = images
+            .map(f => ({ url: subUrl + f, name: decodeURIComponent(f) }))
+            .sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+        }
+
+        galleryData = data;
+        galleryLoaded = true;
+        galleryPicker.style.display = 'none';
+        renderGalleryTabs();
+            } catch (err) {
+        galleryPickerText.textContent = 'No se pudo cargar la galería automáticamente.';
+        const isGitHubPages = location.hostname.endsWith('.github.io');
+        if (isGitHubPages) {
+          galleryPickerNote.textContent = 'Verificá que la carpeta "' + GALLERY_FOLDER + '" exista en el repositorio con subcarpetas que contengan imágenes. Si el problema persiste, puede ser un límite temporal de la API de GitHub; esperá unos minutos y recargá la página.';
+        } else {
+          galleryPickerNote.textContent = 'Esto pasa si abriste el archivo con doble clic (el navegador bloquea leer carpetas así) o si la carpeta "' + GALLERY_FOLDER + '" no está al lado del HTML. Abrí la página con un servidor local (por ejemplo "python -m http.server" en esta carpeta) y volvé a intentar.';
+        }
+      } finally {
+        galleryLoading = false;
+      }
+    }
+
+    function categoryIcon(cat) {
+      return CATEGORY_ICONS[cat.toLowerCase()] || '📁';
+    }
+
+    function renderGalleryTabs() {
+      const cats = Object.keys(galleryData).sort((a, b) => a.localeCompare(b, 'es'));
+      galleryTabs.innerHTML = '';
+
+      if (!cats.length) {
+        galleryGrid.innerHTML = '';
+        galleryPicker.style.display = 'block';
+        galleryPickerText.textContent = 'No se encontraron fotos todavía.';
+        galleryPickerNote.textContent = 'Creá subcarpetas dentro de "' + GALLERY_FOLDER + '" con imágenes adentro.';
+        return;
+      }
+
+      cats.forEach((cat, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'gallery-tab' + (i === 0 ? ' active' : '');
+        btn.type = 'button';
+        btn.textContent = `${categoryIcon(cat)} ${cat}`;
+        btn.addEventListener('click', () => selectCategory(cat, btn));
+        galleryTabs.appendChild(btn);
+      });
+
+      selectCategory(cats[0], galleryTabs.children[0]);
+    }
+
+    function selectCategory(cat, btnEl) {
+      currentCategory = cat;
+      document.querySelectorAll('.gallery-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderGalleryGrid(cat);
+    }
+
+    function renderGalleryGrid(cat) {
+      const imgs = galleryData[cat] || [];
+      galleryGrid.innerHTML = '';
+      galleryEmpty.style.display = imgs.length ? 'none' : 'block';
+      galleryEmpty.textContent = 'Esta categoría todavía no tiene fotos.';
+
+      imgs.forEach((img, idx) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        const imageEl = document.createElement('img');
+        imageEl.src = img.url;
+        imageEl.alt = img.name;
+        imageEl.loading = 'lazy';
+        item.appendChild(imageEl);
+        item.addEventListener('click', () => openLightbox(cat, idx));
+        galleryGrid.appendChild(item);
+      });
+    }
+
+    // ---- Lightbox ----
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    let lightboxIndex = 0;
+
+    function openLightbox(cat, idx) {
+      currentCategory = cat;
+      lightboxIndex = idx;
+      updateLightboxImg();
+      lightbox.classList.add('show');
+    }
+
+    function updateLightboxImg() {
+      const arr = galleryData[currentCategory] || [];
+      if (!arr.length) return;
+      lightboxImg.src = arr[lightboxIndex].url;
+      lightboxImg.alt = arr[lightboxIndex].name;
+    }
+
+    document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('show'));
+    document.getElementById('lightboxPrev').addEventListener('click', () => {
+      const arr = galleryData[currentCategory] || [];
+      if (!arr.length) return;
+      lightboxIndex = (lightboxIndex - 1 + arr.length) % arr.length;
+      updateLightboxImg();
+    });
+    document.getElementById('lightboxNext').addEventListener('click', () => {
+      const arr = galleryData[currentCategory] || [];
+      if (!arr.length) return;
+      lightboxIndex = (lightboxIndex + 1) % arr.length;
+      updateLightboxImg();
+    });
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('show'); });
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('show')) return;
+      if (e.key === 'Escape') lightbox.classList.remove('show');
+      if (e.key === 'ArrowLeft') document.getElementById('lightboxPrev').click();
+      if (e.key === 'ArrowRight') document.getElementById('lightboxNext').click();
+    });
+
+    // Deslizar con el dedo (swipe) para pasar de foto en el celular
+    let lightboxTouchStartX = null;
+    let lightboxTouchStartY = null;
+    lightbox.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      lightboxTouchStartX = e.touches[0].clientX;
+      lightboxTouchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    lightbox.addEventListener('touchend', (e) => {
+      if (lightboxTouchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - lightboxTouchStartX;
+      const dy = e.changedTouches[0].clientY - lightboxTouchStartY;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) document.getElementById('lightboxNext').click();
+        else document.getElementById('lightboxPrev').click();
+      }
+      lightboxTouchStartX = null;
+      lightboxTouchStartY = null;
+    }, { passive: true });
+
+    // ================= VISTA PREVIA DE CANCIONES (Spotify) =================
+    // Cómo agregar una canción: andá a Spotify, tocá "Compartir" > "Copiar enlace del tema"
+    // y pegá ese link tal cual, como un nuevo elemento del array de abajo.
+    // El reproductor de Spotify muestra una vista previa (no la canción completa,
+    // por derechos de autor) y un botón para abrirla en Spotify.
+    const SPOTIFY_LINKS = [
+      'https://open.spotify.com/intl-es/track/0ILCaNMr4s5CZdF1Km09Ln?si=0ae86f96cc42483f', // My One and Only Love
+      'https://open.spotify.com/intl-es/track/3NLrRZoMF0Lx6zTlYqeIo4?si=7e0b8cae6fc0420c', // Here Without You
+    ];
+
+    function extractSpotifyEmbedUrl(link) {
+      const m = link.match(/open\.spotify\.com\/(?:[^/]+\/)?(track|album|playlist|episode)\/([a-zA-Z0-9]+)/);
+      if (!m) return null;
+      return `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator&theme=0`;
+    }
+
+    function renderSongs() {
+      const container = document.getElementById('songEmbeds');
+      const wrapper = document.getElementById('gallerySongs');
+      container.innerHTML = '';
+      const valid = SPOTIFY_LINKS.map(extractSpotifyEmbedUrl).filter(Boolean);
+
+      valid.forEach(embedUrl => {
+        const wrap = document.createElement('div');
+        wrap.className = 'song-embed';
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.width = '100%';
+        iframe.height = '152';
+        iframe.frameBorder = '0';
+        iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+        iframe.loading = 'lazy';
+        wrap.appendChild(iframe);
+        container.appendChild(wrap);
+      });
+
+      wrapper.style.display = valid.length ? 'block' : 'none';
+    }
+    renderSongs();
 
     const worldsInfo = {
       stars: { title: "Cielo Estrellado", desc: "Un manto infinito de estrellas titilantes, atravesado de vez en cuando por una estrella fugaz.", bg: "bg-stars" },
